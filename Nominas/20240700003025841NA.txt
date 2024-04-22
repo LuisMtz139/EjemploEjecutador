@@ -1,0 +1,166 @@
+#COMPROBANTE
+SERIE: NA
+FOLIO: 20240700003025841NA
+FECHA: 2024-04-15T11:06:53
+FORMAPAGO: 99
+SUBTOTAL: 92813.00
+TOTAL: 63816.48
+LEYENDANETOAPAGAR: 63816.48
+TIPODECOMPROBANTE: N
+METODOPAGO: PUE
+TOTALDESCUENTO: 28996.52
+LUGAREXPEDICION: 52148
+MONEDA: MXN
+TIPOCAMBIO: 1
+#FIN COMPROBANTE
+#INICIO EMISOR
+NOMBREEM: COLEGIO NACIONAL DE EDUCACION PROFESIONAL TECNICA
+RFCEM: CNE781229BK4
+REGIMENFISCALEM: 601
+#FIN EMISOR
+#INICIO RECEPTOR
+NOMBRERE: EDGAR MANUEL GONZALEZ CONTRERAS
+RFCRE: GOCE680702D62
+USOCFDIRE: P01
+#FIN RECEPTOR
+#CONCEPTOS
+LINEA1:|84111505||1|Pago de nómina|92813.00|92813.00|ACT||28996.52|
+#FIN CONCEPTOS
+#INICIO TOTALIMPUESTOS
+TOTALIMPRETENIDOS: 26662.01
+TOTALIMPTRASLADADOS: 0
+#FIN TOTALIMPUESTOS
+#RETENCIONES
+RETENCION1: |001|26662.01|
+#FIN RETENCIONES
+#LEYENDAS
+LEYENDA1: 
+LEYENDA2: 
+LEYENDA3: 
+LEYENDA4: 
+LEYENDA5: 
+#FIN LEYENDAS
+#EXTRAS
+customData_CorreoElectronicoEmpleado: 
+customData_CorreoElectronico1: nreyes@conalep.edu.mx
+customData_CorreoElectronico2: crmorales@conalep.edu.mx
+customData_CorreoElectronico3: creyes@conalep.edu.mx
+customData_campo2:
+customData_campo3:
+#FIN EXTRAS
+#Complemento
+Complemento: nomina12
+#INICIO NOMINA
+Version: 1.2
+FechaPago: 2024-04-12
+FechaInicialPago: 2024-04-01
+FechaFinalPago: 2024-04-15
+NumDiasPagados: 30.000
+TipoNomina: O
+TotalPercepciones: 92813.00
+TotalDeducciones: 28996.52
+TotalOtrosPagos: 0.00
+#INICIO EMISORNOMINA
+RegistroPatronal: 1112510074
+#INICIO RECEPTORNOMINA
+Sindicalizado: No
+ClaveEntFed: MEX
+CurpReceptor: GOCE680702HDFNND09
+NumSeguridadSocial: 0000
+FechaInicioRelLaboral: 2024-03-16
+Antiguedad: P4W
+TipoContrato: 01
+TipoJornada: 01
+TipoRegimen: 02
+NumEmpleado: 0000302584
+Departamento: 70610000 DIRDE COORDINACION CON COLEGIOS ESTAT
+Puesto: CFM3301466 DIRECTOR DE AREA
+RiesgoPuesto: 99
+PeriodicidadPago: 04
+Banco: 
+CuentaBancaria: 002180903468014912
+SalarioBaseCotApor: 16285.50
+SalarioDiarioIntegrado: 556.05
+#FIN RECEPTORNOMINA
+#INICIO PERCEPCIONES
+TotalGravadoPercepciones: 92813.00
+TotalExentoPercepciones: 0.00
+TotalSueldos: 92813.00
+TotalSeparacionIndemnizacion: 
+TotalJubilacionPensionRetiro: 
+#INICIO PERCEPCION1
+TipoPercepcion1: 001
+ClavePercepcion1: 1003
+ConceptoPercepcion1: Salario Base
+ImporteGravadoPercepcion1: 16681.55
+ImporteExentoPercepcion1: 0.00
+#FIN PERCEPCION1
+#INICIO PERCEPCION2
+TipoPercepcion2: 038
+ClavePercepcion2: 2518
+ConceptoPercepcion2: Compensacion Garantizada
+ImporteGravadoPercepcion2: 76131.45
+ImporteExentoPercepcion2: 0.00
+#FIN PERCEPCION2
+#FIN PERCEPCIONES
+#INICIO DEDUCCIONES
+TotalOtrasDeducciones: 2334.51
+TotalImpuestosRetenidos: 26662.01
+#INICIO DEDUCCION1
+TipoDeduccion1: 002
+ClaveDeduccion1: 5045
+ConceptoDeduccion1: ISR
+ImporteDeduccion1: 26662.01
+#FIN DEDUCCION1
+#INICIO DEDUCCION2
+TipoDeduccion2: 021
+ClaveDeduccion2: 2920
+ConceptoDeduccion2: Seguro de Retiro
+ImporteDeduccion2: 66.65
+#FIN DEDUCCION2
+#INICIO DEDUCCION3
+TipoDeduccion3: 021
+ClaveDeduccion3: 2735
+ConceptoDeduccion3: Seguro de vida Aseguradora
+ImporteDeduccion3: 495.44
+#FIN DEDUCCION3
+#INICIO DEDUCCION4
+TipoDeduccion4: 021
+ClaveDeduccion4: 6250
+ConceptoDeduccion4: Seguro de Trabajador Activo
+ImporteDeduccion4: 458.74
+#FIN DEDUCCION4
+#INICIO DEDUCCION5
+TipoDeduccion5: 021
+ClaveDeduccion5: 6251
+ConceptoDeduccion5: Seguro de Trabajador Pensionado
+ImporteDeduccion5: 104.26
+#FIN DEDUCCION5
+#INICIO DEDUCCION6
+TipoDeduccion6: 021
+ClaveDeduccion6: 6252
+ConceptoDeduccion6: Seguro de Invalidez y Vida
+ImporteDeduccion6: 104.26
+#FIN DEDUCCION6
+#INICIO DEDUCCION7
+TipoDeduccion7: 021
+ClaveDeduccion7: 6253
+ConceptoDeduccion7: Seguro Sociales y Culturales
+ImporteDeduccion7: 83.41
+#FIN DEDUCCION7
+#INICIO DEDUCCION8
+TipoDeduccion8: 003
+ClaveDeduccion8: 6254
+ConceptoDeduccion8: Seguro Cesantia en Edad Avanzada
+ImporteDeduccion8: 1021.75
+#FIN DEDUCCION8
+#FIN DEDUCCIONES
+#INICIO OTROS PAGOS
+#INICIO OTRO PAGO1
+TipoOtroPago1: 002
+ClaveOtroPago1: 5050
+ConceptoOtroPago1: Subsidio al empleo
+ImporteOtroPago1: 0.00
+SubsidioCausado1: 0.00
+#FIN OTRO PAGO1
+#FIN OTROS PAGOS
