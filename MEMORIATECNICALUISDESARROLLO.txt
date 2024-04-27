@@ -10,7 +10,7 @@ Consumo de Web Services para timbrado Conalep:
 
 TESTEO
 http://localhost:1234/RocencranService/Generanomina/  C:CFinalServiceQR|CCNE781229BK4_TEST  /  IDDEESCENARIO  /  NOQUINCENA  /  REGISTRO PATRONAL  /  S  LA S INDICA QUE SE OMITE CREACION DE XML Y PDF PAR ALIGERAR EL TESTEO DE LOS ARCHIVOS DE UNIVERSO
-
+                                                        C:|Users|pssbo|Downloads|FinalServiceQRluisdesarrollo|FinalServiceQR|CNE781229BK4_TEST
 
 PRODUCCION
 http://localhost:1234/RocencranService/Generanomina/  C:CFinalServiceQR|CCNE781229BK4  /  IDDEESCENARIO  /  NOQUINCENA  /  REGISTRO PATRONAL  /  N  LA N INDICA QUE AHORA SI SE CREA XML Y PDF YA QUE ESTAMOS EN PRODUCCION
