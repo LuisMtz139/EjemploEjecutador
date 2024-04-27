@@ -8,6 +8,7 @@ import subprocess
 import csv
 import urllib.parse
 import requests 
+from enviarTest import DataSender
 from tableError import TableError
 import re
 
@@ -93,7 +94,8 @@ class VistaPrincipal:
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
 
         self.cargar_datos_escenario()
-        self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado", command=self.enviar_datos)
+        self.data_sender = DataSender(self.entries, self.dropdown, self.path, self.mostrar_vista_errores)
+        self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado", command=self.data_sender.enviar_datos)
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
         
@@ -167,42 +169,16 @@ class VistaPrincipal:
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
 
 
-    def enviar_datos(self):
-        escenario_id = self.entries['Escenario Id'].get().strip()
-        quincena_no = self.entries['Quincena No.'].get().strip()
-        registro_patronal_text = self.dropdown.get().strip()
-        registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
 
-        escenario_id_encoded = urllib.parse.quote(escenario_id)
-        quincena_no_encoded = urllib.parse.quote(quincena_no)
-        registro_patronal_encoded = urllib.parse.quote(registro_patronal)
-
-        base_url = "http://localhost:1234/RocencranService/Generanomina/C:|Users|pssbo|Downloads|FinalServiceQRluisdesarrollo|FinalServiceQR|CNE781229BK4_TEST"
-        full_url = f"{base_url}/{escenario_id_encoded}/{quincena_no_encoded}/{registro_patronal_encoded}/S"
-
-        print("URL completa:", full_url)
-
-        try:
-            response = requests.get(full_url)
-            response.raise_for_status()  # Lanza un error para respuestas no exitosas
-            print("Respuesta recibida:", response.text)
-
-            # Verificar la carpeta de erróneos después de la petición
-            erroneos_dir = os.path.join(self.path, escenario_id, 'erroneos')
-            if os.listdir(erroneos_dir):  # Verificar si la carpeta contiene archivos
-                print("Se encontraron errores. Redireccionando a la vista de errores.")
-                self.mostrar_vista_errores()
-            else:
-                print("No se encontraron errores.")
-        except requests.RequestException as e:
-            print("Error al realizar la petición:", e)
 
     def mostrar_vista_errores(self):
+        escenario_id = self.entries['Escenario Id'].get().strip()  # Asegurarse de obtener el ID del escenario actual
         self.new_window = tk.Toplevel(self.master)
-        self.app = TableError(self.new_window)
+        self.app = TableError(self.new_window, escenario_id)  # Pasar el escenario_id al constructor de TableError
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
+
 
             
             
