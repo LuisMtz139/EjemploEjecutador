@@ -1,9 +1,9 @@
+import shutil
 import tkinter as tk
 from tkinter import ttk
 from tkinter import Scrollbar
 import os
 import xml.etree.ElementTree as ET
-import shutil
 
 class TableError:
     def __init__(self, master, escenario_id, quincena_no, registro_patronal):
@@ -14,15 +14,9 @@ class TableError:
         
         self.files_edited = {}  # Diccionario para rastrear qué archivos han sido editados
         
-        
-        
-        
         print('ecenario id', escenario_id)
         print('numero de quincena ', quincena_no),
         print('registro patronal', registro_patronal)
-        
-        
-        
         
         print(f"Escenario ID: {self.escenario_id}")
         self.master.title("Conalep-timbrado")
@@ -96,7 +90,7 @@ class TableError:
         if self.listbox.curselection():
             seleccion = self.listbox.get(self.listbox.curselection())
             print(f"Archivo seleccionado: {seleccion}")
-            archivo_seleccionado_path = os.path.join(self.config_path, self.escenario_id, 'universo_incidencias', seleccion)
+            archivo_seleccionado_path = os.path.join(self.config_path, self.escenario_id, 'universo', seleccion)
             error_file_path = os.path.join(self.config_path, self.escenario_id, 'erroneos', 'errortimbrado.txt')
             error_line = "No se encontró información para el archivo"  # Mensaje predeterminado si no se encuentra la línea
             try:
@@ -137,14 +131,13 @@ class TableError:
     def guardar_cambios(self, event):
         if self.listbox.curselection():  # Verifica si hay una selección
             seleccion = self.listbox.get(self.listbox.curselection())
-            error_file_path = os.path.join(self.config_path, self.escenario_id, 'universo_incidencias', seleccion)
             self.files_edited[seleccion] = True
             if all(self.files_edited.values()):
                 self.button.config(state=tk.NORMAL)
             
             try:
                 contenido = self.error_text.get(1.0, tk.END)
-                with open(error_file_path, 'w') as file:
+                with open(seleccion, 'w') as file:
                     file.write(contenido)
             except Exception as e:
                 print(f"Ocurrió un error al intentar guardar los cambios en el archivo {seleccion}: {e}")
@@ -153,11 +146,11 @@ class TableError:
 
             
     def populate_listbox(self):
-        incidencias_dir = os.path.join(self.config_path, self.escenario_id, 'universo_incidencias')
-        if os.path.exists(incidencias_dir):
-            files = os.listdir(incidencias_dir)
+        universo_dir = os.path.join(self.config_path, self.escenario_id, 'universo')
+        if os.path.exists(universo_dir):
+            files = os.listdir(universo_dir)
             for file in files:
-                if os.path.isfile(os.path.join(incidencias_dir, file)):
+                if os.path.isfile(os.path.join(universo_dir, file)):
                     self.listbox.insert(tk.END, file)
                     self.files_edited[file] = False  
                     
@@ -170,7 +163,7 @@ class TableError:
     def create_scenario_directory(self, escenario_id):
         base_dir = os.path.join(self.config_path, escenario_id)
         os.makedirs(base_dir, exist_ok=True)
-        os.makedirs(os.path.join(base_dir, 'universo_incidencias'), exist_ok=True)
+        # No es necesario crear la carpeta 'universo' aquí
         
     def execute_test(self):
         # Navegar a la ruta del archivo de configuración
@@ -180,14 +173,6 @@ class TableError:
         # Construir la ruta al escenario específico
         scenario_path = os.path.join(self.config_path, self.escenario_id)
         
-        # Ruta a la carpeta "erroneos"
-        erroneos_path = os.path.join(scenario_path, 'erroneos')
-
-        # Eliminar la carpeta "erroneos" antes de listar otros contenidos
-        if os.path.exists(erroneos_path):
-            shutil.rmtree(erroneos_path)
-            print(f"La carpeta 'erroneos' en {erroneos_path} ha sido eliminada.")
-
         # Verificar si el directorio del escenario existe y listar su contenido
         if os.path.exists(scenario_path):
             print("Contenido de la carpeta del escenario:", self.escenario_id, scenario_path)
@@ -209,52 +194,12 @@ class TableError:
                     if entry.is_dir() and entry.name == 'erroneos':
                         erroneos_folder_exists = True  # Se encuentra la carpeta erroneos
 
-            if erroneos_folder_exists:
-                self.handle_errors_and_move_files()  # Llamar al método para manejar errores y mover archivos
-        else:
-            print("La carpeta del escenario especificado no existe.")
-
-    def handle_errors_and_move_files(self):
-        error_file_path = os.path.join(self.config_path, self.escenario_id, 'erroneos', 'errortimbrado.txt')
-        target_directory = os.path.join(self.config_path, self.escenario_id, 'universo_incidencias')
-
-        if not os.path.exists(target_directory):
-            os.makedirs(target_directory, exist_ok=True)
-
-        try:
-            # Leer y mostrar contenido de errortimbrado.txt
-            with open(error_file_path, 'r') as file:
-                contenido_errortimbrado = file.read()
-                print(f"Contenido de errortimbrado.txt:\n\n{contenido_errortimbrado}")
-
-            # Mover archivos de la carpeta erroneos a universo_incidencias
-            with open(error_file_path, 'r') as file:
-                for line in file:
-                    parts = line.split('|')
-                    if len(parts) > 4:
-                        file_path = parts[4].replace('/', '\\').strip()  # Aseguramos el formato correcto
-                        destination_path = os.path.join(target_directory, os.path.basename(file_path))
-                        # Verificamos que el archivo a mover realmente existe
-                        if os.path.exists(file_path):
-                            shutil.move(file_path, destination_path)  # Mueve el archivo a la carpeta destino
-                            print(f"Archivo movido: {file_path} -> {destination_path}")
-                        else:
-                            print(f"El archivo no existe: {file_path}")
-        except FileNotFoundError:
-            print("El archivo errortimbrado.txt no existe en la carpeta especificada.")
-        except Exception as e:
-            print(f"Ocurrió un error al intentar mover los archivos: {e}")
-
-        # Eliminar la carpeta erroneos después de mover los archivos
-        # shutil.rmtree(os.path.join(self.config_path, self.escenario_id, 'erroneos'))
-        # print("Carpeta 'erroneos' eliminada.")
-
     def populate_listbox(self):
-        incidencias_dir = os.path.join(self.config_path, self.escenario_id, 'universo_incidencias')
-        if os.path.exists(incidencias_dir):
-            files = os.listdir(incidencias_dir)
+        universo_dir = os.path.join(self.config_path, self.escenario_id, 'universo')
+        if os.path.exists(universo_dir):
+            files = os.listdir(universo_dir)
             for file in files:
-                if os.path.isfile(os.path.join(incidencias_dir, file)):
+                if os.path.isfile(os.path.join(universo_dir, file)):
                     self.listbox.insert(tk.END, file)
 
 def main():
