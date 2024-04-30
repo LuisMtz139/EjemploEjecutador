@@ -1,7 +1,7 @@
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
+from ttkthemes import ThemedStyle  # Importar ThemedStyle para acceder a más opciones de estilo
 import os
 import xml.etree.ElementTree as ET
 import subprocess
@@ -13,18 +13,17 @@ from tableError import TableError
 import re
 
 
-#http://localhost:1234/RocencranService/Generanomina/C:%7CFinalServiceQR%7CCNE781229BK4_TEST/TXT07/07/1112510074/N
 class VistaPrincipal:
     def __init__(self, master):
         self.master = master
         self.master.title("Conalep-timbrado")
         
+        # Leer el archivo de configuración
         tree = ET.parse('config.xml')
         root = tree.getroot()
         self.path = root.find('RutaCarpetas').text
 
-
-        # Maximiza la ventana para que ocupe el 100% de la pantalla
+        # Maximizar la ventana para que ocupe el 100% de la pantalla
         self.master.state('zoomed')
 
         self.main_frame = tk.Frame(master)
@@ -44,10 +43,9 @@ class VistaPrincipal:
         # Título para el menú desplegable
         tk.Label(self.inner_frame, text="Registro Patronal", font=("Arial", 15)).grid(row=0, column=len(inputs), padx=20, sticky=tk.W)
 
-        options = ['EXCEL NOMINA IMSS  54454646465', 'Opción 2', 'Opción 3']
+        options = ['ORDINARIA IMSSS', 'ORDINARIA ISSSTE', 'EXTRAORDINARIA IMSSS', 'EXTRAORDINARIA ISSSTE']
         self.dropdown = ttk.Combobox(self.inner_frame, values=options, font=("Arial", 15), state="readonly", style="Custom.TCombobox", width=30)
         self.dropdown.grid(row=1, column=len(inputs), padx=20, sticky=tk.W)
-
 
         # Definir el estilo del menú desplegable
         self.inner_frame.style = ttk.Style()
@@ -57,20 +55,19 @@ class VistaPrincipal:
         # Configurar el color de fondo de la lista desplegable
         self.inner_frame.style.configure("Custom.TCombobox.Listbox", background="lightyellow")
 
-
         button = tk.Button(self.inner_frame, text='Nuevo', font=("Arial", 13), bg='light yellow')
         button.grid(row=1, column=len(inputs), padx=10, sticky=tk.E)
         self.inner_frame.grid_columnconfigure(len(inputs), weight=1)
         self.inner_frame.grid_columnconfigure(len(inputs)+1, minsize=90)
 
-        button2 = tk.Button(self.inner_frame, text='Crear ecenario', font=("Arial", 13), bg='light yellow', command=self.crear_escenario)
+        button2 = tk.Button(self.inner_frame, text='Crear escenario', font=("Arial", 13), bg='light yellow', command=self.crear_escenario)
         button2.grid(row=1, column=len(inputs)+1, padx=10, sticky=tk.E)
         
         self.table = ttk.Treeview(self.inner_frame)
         self.table['columns'] = ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8')
         self.table.column('#0', width=0, stretch=tk.NO)
-        self.table.column('#1', width=150, stretch=tk.YES, anchor='center')  # Añade anchor='center' aquí
-        self.table.column('#2', width=150, stretch=tk.YES, anchor='center')  # Repite según necesidad para otras columnas
+        self.table.column('#1', width=150, stretch=tk.YES, anchor='center')
+        self.table.column('#2', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#3', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#4', width=150, stretch=tk.YES)
         self.table.column('#5', width=150, stretch=tk.YES)
@@ -78,8 +75,8 @@ class VistaPrincipal:
         self.table.column('#7', width=150, stretch=tk.YES)
         self.table.column('#8', width=150, stretch=tk.YES)
 
-        self.table.heading('#1', text='ESCENARIO ID', anchor='center')  # Centrar el texto del encabezado también
-        self.table.heading('#2', text='QUINCENA NO.', anchor='center')  # Repite según necesidad para otros encabezados
+        self.table.heading('#1', text='ESCENARIO ID', anchor='center')
+        self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
         self.table.heading('#4', text='STATUS')
         self.table.heading('#5', text='NOXMLSCANDIDATOS')
@@ -99,12 +96,8 @@ class VistaPrincipal:
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
         
-        
-        
-        # self.button = tk.Button(self.main_frame, text="Iniciar Porceso de timbrado",font=("Arial", 13), bg='light yellow',  command=self.cambiar_vista)
-        # self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
-        self.button.config(width=25, height=2, font=("Arial", 13))
-
+        # Configurar colores alternativos para las filas de la tabla
+        self.configure_row_colors()
 
     def cargar_datos_escenario(self):
         try:
@@ -119,20 +112,16 @@ class VistaPrincipal:
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
 
-    
-
     def crear_escenario(self):
         now = datetime.now()
         now_str = now.strftime("%m%d%Y%H%M")
-        quincena_no = self.entries['Quincena No.'].get()  # Obtener el valor actual de la entrada de Quincena No.
-        tipo_nomina = self.dropdown.get()  # Obtener el valor seleccionado en el combobox para Tipo de Nómina
-        registro_patronal = self.dropdown.get()  # Asumiendo que este es el registro patronal, ajusta según tu diseño real
+        quincena_no = self.entries['Quincena No.'].get()
+        tipo_nomina = self.dropdown.get()
+        registro_patronal = self.dropdown.get()
 
-        # Limpiar y establecer el nuevo Escenario Id
         self.entries['Escenario Id'].delete(0, tk.END)
         self.entries['Escenario Id'].insert(0, now_str)
 
-        # Guarda el ID del escenario, número de quincena y registro patronal en un archivo CSV
         with open("escenario_ids.csv", "a", newline='') as file:
             writer = csv.writer(file)
             writer.writerow([now_str, now.strftime("%Y-%m-%d %H:%M"), quincena_no, registro_patronal])
@@ -145,51 +134,28 @@ class VistaPrincipal:
         os.makedirs(os.path.join(base_dir, 'timbrado'), exist_ok=True)
         subprocess.run(['explorer', universo_dir])
 
-        # Añade el nuevo escenario a la tabla
         self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, 'STATUS', 'NOXMLSCANDIDATOS', 'NOXMLSTIMBRADOS', 'NOXMLSERRONEOS', 'NOREVISION'))
 
-    
-                
-        
-    def cambiar_vista(self):
-        # Imprimir los valores requeridos
-        escenario_id = self.entries['Escenario Id'].get()  # Obtener el valor actual de 'Escenario ID'
-        quincena_no = self.entries['Quincena No.'].get()  # Obtener el valor actual de 'Quincena No.'
-        tipo_nomina = self.dropdown.get()  # Obtener el valor seleccionado en el combobox para 'Tipo de Nómina'
+    def configure_row_colors(self):
+        self.table.tag_configure('oddrow', background='#E0E0F8')  # Color azul claro
+        self.table.tag_configure('evenrow', background='white')  # Color blanco
 
-        print("Escenario ID:", escenario_id)
-        print("Quincena No.:", quincena_no)
-        print("Tipo de Nómina:", tipo_nomina)
-
-        # Aquí iría el resto del código para cambiar la vista o lo que originalmente hace cambiar_vista
-        self.new_window = tk.Toplevel(self.master)
-        self.app = TableError(self.new_window)
-        window_x = self.master.winfo_x()
-        window_y = self.master.winfo_y()
-        self.new_window.geometry("+%d+%d" % (window_x, window_y))
-
-
-
+        for i, row in enumerate(self.table.get_children()):
+            tag = 'oddrow' if i % 2 == 0 else 'evenrow'
+            self.table.item(row, tags=(tag,))
 
     def mostrar_vista_errores(self):
-        escenario_id = self.entries['Escenario Id'].get().strip()  # Asegurarse de obtener el ID del escenario actual
+        escenario_id = self.entries['Escenario Id'].get().strip()
+        quincena_no = self.entries['Quincena No.'].get().strip()
+        registro_patronal_text = self.dropdown.get().strip()
+        registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
+        
         self.new_window = tk.Toplevel(self.master)
-        self.app = TableError(self.new_window, escenario_id)  # Pasar el escenario_id al constructor de TableError
+        self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal)
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
 
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
     def cerrar(self):
         self.master.destroy()
 
