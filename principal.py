@@ -134,6 +134,8 @@ class VistaPrincipal:
 
         self.entries['Escenario Id'].delete(0, tk.END)
         self.entries['Escenario Id'].insert(0, now_str)
+        self.entries['Escenario Id'].config(state="readonly")  # Bloquear la entrada de texto
+        self.entries['Escenario Id'].bind("<FocusIn>", lambda event: self.entries['Escenario Id'].config(state="readonly"))  # Bloquear la entrada de texto cuando el campo gana el foco
 
         with open("escenario_ids.csv", "a", newline='') as file:
             writer = csv.writer(file)
