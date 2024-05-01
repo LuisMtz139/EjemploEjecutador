@@ -14,18 +14,25 @@ import re
 
 
 class VistaPrincipal:
+    
+    def validar_quincena(self, input):
+        # Permite la entrada si es dígito y tiene menos de dos caracteres o es vacío para manejar el borrado
+        if input.isdigit() or input == "":
+            return True
+        return False
+
     def __init__(self, master):
         self.master = master
         self.master.title("Conalep-timbrado")
         
-        # Leer el archivo de configuración
         tree = ET.parse('config.xml')
         root = tree.getroot()
         self.path = root.find('RutaCarpetas').text
-
-        # Maximizar la ventana para que ocupe el 100% de la pantalla
+        
+        # Corrección aquí: usar self.validar_quincena para referenciar el método correcto
+        vcmd = self.master.register(self.validar_quincena)  # Usa self para referenciar el método de instancia
+        
         self.master.state('zoomed')
-
         self.main_frame = tk.Frame(master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
         
@@ -33,26 +40,28 @@ class VistaPrincipal:
         self.inner_frame.pack(fill=tk.BOTH, expand=1, padx=20, pady=20) 
 
         inputs = ['Escenario Id', 'Quincena No.']
-        self.entries = {}  # Almacena referencias a los widgets de entrada
+        self.entries = {} 
+    
         for i, input_text in enumerate(inputs):
             tk.Label(self.inner_frame, text=input_text, font=("Arial", 15)).grid(row=0, column=i, padx=10)
-            entry = tk.Entry(self.inner_frame, width=20, bg='light yellow', font=("Arial", 15), justify='center')  
+            if input_text == 'Quincena No.':
+                entry = tk.Entry(self.inner_frame, validate="key", validatecommand=(vcmd, '%P'),
+                                width=20, bg='light yellow', font=("Arial", 15), justify='center')
+            else:
+                entry = tk.Entry(self.inner_frame, width=20, bg='light yellow', font=("Arial", 15), justify='center')
             entry.grid(row=1, column=i, padx=45)
             self.entries[input_text] = entry
-        
-        # Título para el menú desplegable
+            
         tk.Label(self.inner_frame, text="Registro Patronal", font=("Arial", 15)).grid(row=0, column=len(inputs), padx=20, sticky=tk.W)
 
         options = ['ORDINARIA IMSSS', 'ORDINARIA ISSSTE', 'EXTRAORDINARIA IMSSS', 'EXTRAORDINARIA ISSSTE']
         self.dropdown = ttk.Combobox(self.inner_frame, values=options, font=("Arial", 15), state="readonly", style="Custom.TCombobox", width=30)
         self.dropdown.grid(row=1, column=len(inputs), padx=20, sticky=tk.W)
 
-        # Definir el estilo del menú desplegable
         self.inner_frame.style = ttk.Style()
         self.inner_frame.style.theme_use("default")
         self.inner_frame.style.configure("Custom.TCombobox", selectbackground=self.inner_frame.cget("background"), selectforeground="black", anchor="center", background="lightyellow") 
 
-        # Configurar el color de fondo de la lista desplegable
         self.inner_frame.style.configure("Custom.TCombobox.Listbox", background="lightyellow")
 
         button = tk.Button(self.inner_frame, text='Nuevo', font=("Arial", 13), bg='light yellow')
@@ -84,20 +93,24 @@ class VistaPrincipal:
         self.table.heading('#7', text='NOXMLSERRONEOS')
         self.table.heading('#8', text='NOREVISION')
 
-        # Estilo para las cabeceras de columna
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
 
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
 
         self.cargar_datos_escenario()
-        self.data_sender = DataSender(self.entries, self.dropdown, self.path, self.mostrar_vista_errores)
-        self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado", command=self.data_sender.enviar_datos)
+        self.configurar_envio_datos()
+        
+        self.configure_row_colors()
+
+
+    def configurar_envio_datos(self):
+        data_sender = DataSender()
+        self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado",
+                                command=lambda: data_sender.enviar_datos(self.entries, self.dropdown, self.path, self.mostrar_vista_errores))
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
-        
-        # Configurar colores alternativos para las filas de la tabla
-        self.configure_row_colors()
+    
 
     def cargar_datos_escenario(self):
         try:
@@ -145,16 +158,21 @@ class VistaPrincipal:
             self.table.item(row, tags=(tag,))
 
     def mostrar_vista_errores(self):
+        if hasattr(self, 'new_window') and self.new_window.winfo_exists():
+            # Si la ventana de errores ya está abierta, no hacer nada
+            return
+        
         escenario_id = self.entries['Escenario Id'].get().strip()
         quincena_no = self.entries['Quincena No.'].get().strip()
         registro_patronal_text = self.dropdown.get().strip()
         registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
-        
+
         self.new_window = tk.Toplevel(self.master)
-        self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal)
+        self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal_text)
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
+
 
     def cerrar(self):
         self.master.destroy()

@@ -3,16 +3,10 @@ import urllib.parse
 import requests
 
 class DataSender:
-    def __init__(self, entries, dropdown, path, mostrar_vista_errores):
-        self.entries = entries
-        self.dropdown = dropdown
-        self.path = path
-        self.mostrar_vista_errores = mostrar_vista_errores
-
-    def enviar_datos(self):
-        escenario_id = self.entries['Escenario Id'].get().strip()
-        quincena_no = self.entries['Quincena No.'].get().strip()
-        registro_patronal = self.dropdown.get().strip()
+    def enviar_datos(self, entries, dropdown, path, mostrar_vista_errores):
+        escenario_id = entries['Escenario Id'].get().strip()
+        quincena_no = entries['Quincena No.'].get().strip()
+        registro_patronal = dropdown.get().strip()
 
         escenario_id_encoded = urllib.parse.quote(escenario_id)
         quincena_no_encoded = urllib.parse.quote(quincena_no)
@@ -25,14 +19,13 @@ class DataSender:
 
         try:
             response = requests.get(full_url)
-            response.raise_for_status()  # Lanza un error para respuestas no exitosas
+            response.raise_for_status()
             print("Respuesta recibida:", response.text)
 
-            # Verificar la carpeta de erróneos después de la petición
-            erroneos_dir = os.path.join(self.path, escenario_id, 'erroneos')
-            if os.listdir(erroneos_dir):  # Verificar si la carpeta contiene archivos
+            erroneos_dir = os.path.join(path, escenario_id, 'erroneos')
+            if os.listdir(erroneos_dir):
                 print("Se encontraron errores. Redireccionando a la vista de errores.")
-                self.mostrar_vista_errores()
+                mostrar_vista_errores()
             else:
                 print("No se encontraron errores.")
         except requests.RequestException as e:

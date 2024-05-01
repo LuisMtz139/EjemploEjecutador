@@ -1,0 +1,195 @@
+Contenido del archivo '20242500002801051NA.txt':
+
+#COMPROBANTE
+SERIE: NA
+FOLIO: 20242500002801051NA
+FECHA: 2024-0-29T13:23:58
+FORMAPAGO: 99
+SUBTOTAL: 42502.95
+TOTAL: 15286.16
+LEYENDANETOAPAGAR: 15286.16
+TIPODECOMPROBANTE: N
+METODOPAGO: PUE
+TOTALDESCUENTO: 27216.79
+LUGAREXPEDICION: 52148
+MONEDA: MXN
+TIPOCAMBIO: 1
+#FIN COMPROBANTE
+#INICIO EMISOR
+NOMBREEM: COLEGIO NACIONAL DE EDUCACION PROFESIONAL TECNICA
+RFCEM: CNE781229BK4
+REGIMENFISCALEM: 601
+#FIN EMISOR
+#INICIO RECEPTOR
+NOMBRERE: EDITH CONSUELO CRUZ CASTRO
+RFCRE: CUCE771201KS7
+USOCFDIRE: P01
+#FIN RECEPTOR
+#CONCEPTOS
+LINEA1:|84111505||1|Pago de nómina|42502.95|42502.95|ACT||27216.79|
+#FIN CONCEPTOS
+#INICIO TOTALIMPUESTOS
+TOTALIMPRETENIDOS: 10020.84
+TOTALIMPTRASLADADOS: 0
+#FIN TOTALIMPUESTOS
+#RETENCIONES
+RETENCION1: |001|10020.84|
+#FIN RETENCIONES
+#LEYENDAS
+LEYENDA1: 
+LEYENDA2: 
+LEYENDA3: 
+LEYENDA4: 
+LEYENDA5: 
+#FIN LEYENDAS
+#EXTRAS
+customData_CorreoElectronicoEmpleado: edith.cruz.dir011@df.conalep.edu.mx
+customData_CorreoElectronico1: nreyes@conalep.edu.mx
+customData_CorreoElectronico2: crmorales@conalep.edu.mx
+customData_CorreoElectronico3: creyes@conalep.edu.mx
+customData_campo2:
+customData_campo3:
+#FIN EXTRAS
+#Complemento
+Complemento: nomina12
+#INICIO NOMINA
+Version: 1.2
+FechaPago: 2024-03-31
+FechaInicialPago: 2024-03-16
+FechaFinalPago: 2024-03-31
+NumDiasPagados: 45.000
+TipoNomina: O
+TotalPercepciones: 42502.95
+TotalDeducciones: 27216.79
+TotalOtrosPagos: 0.00
+#INICIO EMISORNOMINA
+RegistroPatronal: 1112510074
+#INICIO RECEPTORNOMINA
+Sindicalizado: No
+ClaveEntFed: CMX
+CurpReceptor: CUCE771201MDFRSD01
+NumSeguridadSocial: 80127752923 
+FechaInicioRelLaboral: 2018-08-16
+Antiguedad: P293W
+TipoContrato: 01
+TipoJornada: 01
+TipoRegimen: 02
+NumEmpleado: 0000280105
+Departamento: 210 IZTACALCO I
+Puesto: CF33206 JEFE DE PROYECTO
+RiesgoPuesto: 99
+PeriodicidadPago: 04
+Banco: 
+CuentaBancaria: 014441565695141370
+SalarioBaseCotApor: 16285.50
+SalarioDiarioIntegrado: 871.02
+#FIN RECEPTORNOMINA
+#INICIO PERCEPCIONES
+TotalGravadoPercepciones: 42502.95
+TotalExentoPercepciones: 0.00
+TotalSueldos: 42502.95
+TotalSeparacionIndemnizacion: 
+TotalJubilacionPensionRetiro: 
+#INICIO PERCEPCION1
+TipoPercepcion1: 001
+ClavePercepcion1: 1003
+ConceptoPercepcion1: Salario Base
+ImporteGravadoPercepcion1: 39195.98
+ImporteExentoPercepcion1: 0.00
+#FIN PERCEPCION1
+#INICIO PERCEPCION2
+TipoPercepcion2: 038
+ClavePercepcion2: 2518
+ConceptoPercepcion2: Compensacion Garantizada
+ImporteGravadoPercepcion2: 641.17
+ImporteExentoPercepcion2: 0.00
+#FIN PERCEPCION2
+#INICIO PERCEPCION3
+TipoPercepcion3: 038
+ClavePercepcion3: 2517
+ConceptoPercepcion3: Eficiencia en el Trabajo
+ImporteGravadoPercepcion3: 679.80
+ImporteExentoPercepcion3: 0.00
+#FIN PERCEPCION3
+#INICIO PERCEPCION4
+TipoPercepcion4: 029
+ClavePercepcion4: 2800
+ConceptoPercepcion4: Despensa
+ImporteGravadoPercepcion4: 1986.00
+ImporteExentoPercepcion4: 0.00
+#FIN PERCEPCION4
+#FIN PERCEPCIONES
+#INICIO DEDUCCIONES
+TotalOtrasDeducciones: 17195.95
+TotalImpuestosRetenidos: 10020.84
+#INICIO DEDUCCION1
+TipoDeduccion1: 002
+ClaveDeduccion1: 5045
+ConceptoDeduccion1: ISR
+ImporteDeduccion1: 10020.84
+#FIN DEDUCCION1
+#INICIO DEDUCCION2
+TipoDeduccion2: 021
+ClaveDeduccion2: 2920
+ConceptoDeduccion2: Seguro de Retiro
+ImporteDeduccion2: 99.98
+#FIN DEDUCCION2
+#INICIO DEDUCCION3
+TipoDeduccion3: 021
+ClaveDeduccion3: 2735
+ConceptoDeduccion3: Seguro de vida Aseguradora
+ImporteDeduccion3: 1164.12
+#FIN DEDUCCION3
+#INICIO DEDUCCION4
+TipoDeduccion4: 021
+ClaveDeduccion4: 6250
+ConceptoDeduccion4: Seguro de Trabajador Activo
+ImporteDeduccion4: 1077.89
+#FIN DEDUCCION4
+#INICIO DEDUCCION5
+TipoDeduccion5: 021
+ClaveDeduccion5: 6251
+ConceptoDeduccion5: Seguro de Trabajador Pensionado
+ImporteDeduccion5: 244.97
+#FIN DEDUCCION5
+#INICIO DEDUCCION6
+TipoDeduccion6: 021
+ClaveDeduccion6: 6252
+ConceptoDeduccion6: Seguro de Invalidez y Vida
+ImporteDeduccion6: 244.97
+#FIN DEDUCCION6
+#INICIO DEDUCCION7
+TipoDeduccion7: 021
+ClaveDeduccion7: 6253
+ConceptoDeduccion7: Seguro Sociales y Culturales
+ImporteDeduccion7: 195.98
+#FIN DEDUCCION7
+#INICIO DEDUCCION8
+TipoDeduccion8: 003
+ClaveDeduccion8: 6254
+ConceptoDeduccion8: Seguro Cesantia en Edad Avanzada
+ImporteDeduccion8: 2400.75
+#FIN DEDUCCION8
+#INICIO DEDUCCION9
+TipoDeduccion9: 010
+ClaveDeduccion9: 8095
+ConceptoDeduccion9: Credito Hipotecario
+ImporteDeduccion9: 11758.79
+#FIN DEDUCCION9
+#INICIO DEDUCCION10
+TipoDeduccion10: 010
+ClaveDeduccion10: 1927
+ConceptoDeduccion10: Seguro de Danios Fovissste
+ImporteDeduccion10: 8.50
+#FIN DEDUCCION10
+#FIN DEDUCCIONES
+#INICIO OTROS PAGOS
+#INICIO OTRO PAGO1
+TipoOtroPago1: 002
+ClaveOtroPago1: 5050
+ConceptoOtroPago1: Subsidio al empleo
+ImporteOtroPago1: 0.00
+SubsidioCausado1: 0.00
+#FIN OTRO PAGO1
+#FIN OTROS PAGOS
+
