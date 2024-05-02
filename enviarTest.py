@@ -51,11 +51,45 @@ class DataSender:
             excel_files = [file for file in files if file.endswith('.xlsx')]
             if excel_files:
                 excel_path = os.path.join(universo_path, excel_files[0])
-                df = pd.read_excel(excel_path)
-                print("Mostrando contenido del archivo Excel:")
-                print(df)
+
+                # Especificar el formato de las columnas al leer el archivo para evitar la notación científica
+                dtype_spec = {
+                    'CuentaBancaria': str,
+                    'NumEmpleado': str,
+                    'NumSeguridadSocial': str
+                }
+                df = pd.read_excel(excel_path, dtype=dtype_spec)
+
+                # Verificar y convertir columnas al formato deseado
+                for col in dtype_spec:
+                    df[col] = df[col].apply(lambda x: x if pd.isna(x) else str(x))
+
+                # Filtrar las filas donde 'Unnamed: 0' no contiene 'OK'
+                if "Unnamed: 0" in df.columns:
+                    df = df[df["Unnamed: 0"] != "OK"]
+
+                # Encontrar el índice de la columna 'ID' y eliminar la columna anterior si existe
+                if "ID" in df.columns:
+                    id_index = df.columns.get_loc("ID")  # Obtener el índice de la columna 'ID'
+                    if id_index > 0:  # Asegurarse de que 'ID' no es la primera columna
+                        # Eliminar la columna anterior a 'ID'
+                        df.drop(df.columns[id_index - 1], axis=1, inplace=True)
+
+                print("Guardando el archivo Excel modificado...")
+                # Guardar el DataFrame modificado en el mismo archivo sin modificar nombres de columna ni agregar índice
+                df.to_excel(excel_path, index=False)
+                print("Archivo guardado. Filas con 'OK' eliminadas y columna previa a 'ID' eliminada.")
+
+                # Verificar si el DataFrame aún contiene filas y abrir el archivo Excel
+                if not df.empty:
+                    os.startfile(excel_path)
+                    print("Archivo Excel abierto para edición.")
+                else:
+                    print("No hay datos para mostrar en el archivo Excel.")
+
             else:
                 print("No se encontraron archivos Excel en la carpeta 'universo'.")
         else:
             print("No se encontró la carpeta 'universo' en la ruta especificada.")
+
 
