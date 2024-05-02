@@ -5,7 +5,6 @@ from tkinter import ttk
 from tkinter import Scrollbar
 import os
 import xml.etree.ElementTree as ET
-import urllib.parse
 import xml.etree.ElementTree as ET
 from enviarTest import DataSender
 
@@ -29,9 +28,7 @@ class TableError:
         self.config_path = self.load_config_path()
         self.create_scenario_directory(self.escenario_id)
         self.list_directory_contents()
-        
-        #agrega cuandots faltan por timbrar
-        
+                
         self.main_frame = tk.Frame(master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
         
@@ -146,7 +143,6 @@ class TableError:
                 with open(archivo_seleccionado_path, 'w') as file:
                     file.write(contenido)
                 print(f"Cambios guardados en {archivo_seleccionado_path}")
-                # Marcar el archivo como editado
                 self.files_edited[seleccion] = True
                 if all(self.files_edited.values()):
                     self.button.config(state=tk.NORMAL) 
@@ -156,13 +152,13 @@ class TableError:
     def on_text_modified(self, event=None):
         if self.error_text.edit_modified():
             seleccion = self.listbox.get(self.listbox.curselection())
-            self.files_edited[seleccion] = True  # Marcar como editado al modificar
+            self.files_edited[seleccion] = True 
             if all(self.files_edited.values()):
                 self.button.config(state=tk.NORMAL)
             self.error_text.edit_modified(False)
             if self.save_timer:
                 self.master.after_cancel(self.save_timer)
-            self.save_timer = self.master.after(1000, self.guardar_cambios)  # Guardar cambios con retardo
+            self.save_timer = self.master.after(1000, self.guardar_cambios)  
 
             
     def populate_listbox(self):
@@ -172,7 +168,7 @@ class TableError:
             for file in files:
                 if os.path.isfile(os.path.join(universo_dir, file)):
                     self.listbox.insert(tk.END, file)
-                    self.files_edited[file] = False  # Inicializar como no editado
+                    self.files_edited[file] = False  
 
                     
                     
@@ -211,20 +207,15 @@ class TableError:
     def execute_test(self):
         try:
             self.eliminar_carpeta_erroneos()
-
             entries = {
                 'Escenario Id': tk.StringVar(value=self.escenario_id),
                 'Quincena No.': tk.StringVar(value=self.quincena_no)
             }
             dropdown = tk.StringVar(value=self.registro_patronal_text)
-            
             data_sender = DataSender()
-            
             def dummy_mostrar_errores():
                 print("Mostrar vista de errores llamada")
-            
             data_sender.enviar_datos(entries, dropdown, self.config_path, dummy_mostrar_errores)
-            
             self.actualizar_columna_errores_despues_del_test()
 
         except Exception as e:
@@ -235,7 +226,7 @@ class TableError:
         path_erroneos = os.path.join(self.config_path, self.escenario_id, 'erroneos', 'errortimbrado.txt')
         if os.path.exists(path_erroneos):
             with open(path_erroneos, 'r') as file:
-                errores = file.read().strip()  # Asegúrate de eliminar espacios en blanco y saltos de línea
+                errores = file.read().strip()  
                 if errores:
                     self.actualizar_columna_error(errores)
                 else:
@@ -246,7 +237,6 @@ class TableError:
             self.cerrar_ventana()
 
     def cerrar_ventana(self):
-        # Cierra la ventana principal
         self.master.destroy()
 
     
@@ -273,7 +263,7 @@ class TableError:
                 for entry in entries:
                     print(entry.name)
                     if entry.is_dir() and entry.name == 'erroneos':
-                        erroneos_folder_exists = True  # Se encuentra la carpeta erroneos
+                        erroneos_folder_exists = True  
 
 def main():
     root = tk.Tk()

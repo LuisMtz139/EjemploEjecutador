@@ -6,10 +6,8 @@ import xml.etree.ElementTree as ET
 
 class DataSender:
     def __init__(self):
-        # Cargar el archivo de configuración
         tree = ET.parse('config.xml')
         root = tree.getroot()
-        # Extraer la ruta desde el archivo de configuración
         self.path_from_config = root.find('RutaFinalService').text.replace('\\', '|')
 
     def enviar_datos(self, entries, dropdown, path, mostrar_vista_errores):
@@ -21,7 +19,6 @@ class DataSender:
         quincena_no_encoded = urllib.parse.quote(quincena_no)
         registro_patronal_encoded = urllib.parse.quote(registro_patronal)
 
-        # Construir la base URL usando la ruta obtenida del archivo XML
         base_url = f"http://localhost:1234/RocencranService/Generanomina/{self.path_from_config}"
         full_url = f"{base_url}/{escenario_id_encoded}/{quincena_no_encoded}/{registro_patronal_encoded}/N"
 
@@ -41,7 +38,6 @@ class DataSender:
             print("Error al realizar la petición:", e)
 
 
-        # Sección para explorar la carpeta 'universo' y mostrar el contenido de un archivo Excel
         universo_path = os.path.join(path, escenario_id, 'universo')
         print("Explorando la carpeta:", universo_path)
 
@@ -52,7 +48,6 @@ class DataSender:
             if excel_files:
                 excel_path = os.path.join(universo_path, excel_files[0])
 
-                # Especificar el formato de las columnas al leer el archivo para evitar la notación científica
                 dtype_spec = {
                     'CuentaBancaria': str,
                     'NumEmpleado': str,
@@ -60,33 +55,21 @@ class DataSender:
                 }
                 df = pd.read_excel(excel_path, dtype=dtype_spec)
 
-                # Verificar y convertir columnas al formato deseado
                 for col in dtype_spec:
                     df[col] = df[col].apply(lambda x: x if pd.isna(x) else str(x))
 
-                # Filtrar las filas donde 'Unnamed: 0' no contiene 'OK'
                 if "Unnamed: 0" in df.columns:
                     df = df[df["Unnamed: 0"] != "OK"]
 
-                # Encontrar el índice de la columna 'ID' y eliminar la columna anterior si existe
                 if "ID" in df.columns:
-                    id_index = df.columns.get_loc("ID")  # Obtener el índice de la columna 'ID'
-                    if id_index > 0:  # Asegurarse de que 'ID' no es la primera columna
-                        # Eliminar la columna anterior a 'ID'
+                    id_index = df.columns.get_loc("ID")  
+                    if id_index > 0:  
                         df.drop(df.columns[id_index - 1], axis=1, inplace=True)
 
                 print("Guardando el archivo Excel modificado...")
-                # Guardar el DataFrame modificado en el mismo archivo sin modificar nombres de columna ni agregar índice
                 df.to_excel(excel_path, index=False)
                 print("Archivo guardado. Filas con 'OK' eliminadas y columna previa a 'ID' eliminada.")
 
-                # Eliminar los archivos dentro de la carpeta 'erroneos'
-                for file in os.listdir(erroneos_dir):
-                    file_path = os.path.join(erroneos_dir, file)
-                    os.remove(file_path)
-                print("Contenido de la carpeta 'erroneos' eliminado.")
-
-                # Verificar si el DataFrame aún contiene filas y abrir el archivo Excel
                 if not df.empty:
                     os.startfile(excel_path)
                     print("Archivo Excel abierto para edición.")
@@ -97,3 +80,7 @@ class DataSender:
                 print("No se encontraron archivos Excel en la carpeta 'universo'.")
         else:
             print("No se encontró la carpeta 'universo' en la ruta especificada.")
+
+        if any(file.endswith('.txt') for file in files):
+            print("Mostrar vista de errores")
+            mostrar_vista_errores()

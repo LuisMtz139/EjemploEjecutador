@@ -1,25 +1,27 @@
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
-from ttkthemes import ThemedStyle  # Importar ThemedStyle para acceder a más opciones de estilo
+from tkinter import StringVar  # Importar StringVar para poder asociarlo con el Entry
 import os
 import xml.etree.ElementTree as ET
 import subprocess
 import csv
-import urllib.parse
-import requests 
 from enviarTest import DataSender
 from tableError import TableError
 import re
 
-
 class VistaPrincipal:
     
     def validar_quincena(self, input):
-        # Permite la entrada si es dígito y tiene menos de dos caracteres o es vacío para manejar el borrado
         if input.isdigit() or input == "":
             return True
         return False
+
+    def validar_campos(self, *args):
+        if self.entries['Quincena No.'].get() and self.dropdown.get():
+            self.button.config(state=tk.NORMAL)
+        else:
+            self.button.config(state=tk.DISABLED)
 
     def __init__(self, master):
         self.master = master
@@ -29,8 +31,7 @@ class VistaPrincipal:
         root = tree.getroot()
         self.path = root.find('RutaCarpetas').text
         
-        # Corrección aquí: usar self.validar_quincena para referenciar el método correcto
-        vcmd = self.master.register(self.validar_quincena)  # Usa self para referenciar el método de instancia
+        vcmd = self.master.register(self.validar_quincena) 
         
         self.master.state('zoomed')
         self.main_frame = tk.Frame(master)
@@ -45,7 +46,9 @@ class VistaPrincipal:
         for i, input_text in enumerate(inputs):
             tk.Label(self.inner_frame, text=input_text, font=("Arial", 15)).grid(row=0, column=i, padx=10)
             if input_text == 'Quincena No.':
-                entry = tk.Entry(self.inner_frame, validate="key", validatecommand=(vcmd, '%P'),
+                self.quincena_var = StringVar()
+                self.quincena_var.trace('w', self.validar_campos)
+                entry = tk.Entry(self.inner_frame, textvariable=self.quincena_var, validate="key", validatecommand=(vcmd, '%P'),
                                 width=20, bg='light yellow', font=("Arial", 15), justify='center')
             else:
                 entry = tk.Entry(self.inner_frame, width=20, bg='light yellow', font=("Arial", 15), justify='center')
@@ -53,9 +56,6 @@ class VistaPrincipal:
             self.entries[input_text] = entry
             
         tk.Label(self.inner_frame, text="Registro Patronal", font=("Arial", 15)).grid(row=0, column=len(inputs), padx=20, sticky=tk.W)
-
-    
-        #agrega cuandots faltan por timbrar
         
         options = ['ORDINARIA IMSSS', 'ORDINARIA ISSSTE', 'EXTRAORDINARIA IMSSS', 'EXTRAORDINARIA ISSSTE']
         self.dropdown = ttk.Combobox(self.inner_frame, values=options, font=("Arial", 15), state="readonly", style="Custom.TCombobox", width=30)
@@ -66,9 +66,9 @@ class VistaPrincipal:
         self.inner_frame.style.configure("Custom.TCombobox", selectbackground=self.inner_frame.cget("background"), selectforeground="black", anchor="center", background="lightyellow") 
 
         self.inner_frame.style.configure("Custom.TCombobox.Listbox", background="lightyellow")
-
-        button = tk.Button(self.inner_frame, text='Nuevo', font=("Arial", 13), bg='light yellow')
+        button = tk.Button(self.inner_frame, text='Nuevo', font=("Arial", 13), bg='light yellow', command=self.resetear_campos)
         button.grid(row=1, column=len(inputs), padx=10, sticky=tk.E)
+
         self.inner_frame.grid_columnconfigure(len(inputs), weight=1)
         self.inner_frame.grid_columnconfigure(len(inputs)+1, minsize=90)
 
@@ -84,24 +84,19 @@ class VistaPrincipal:
         self.table.column('#4', width=150, stretch=tk.YES)
         self.table.column('#5', width=150, stretch=tk.YES)
 
-
         self.table.heading('#1', text='ESCENARIO ID', anchor='center')
         self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
         self.table.heading('#4', text='STATUS')
         self.table.heading('#5', text='POR_TIMBRAR')
 
-
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
-
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
 
         self.cargar_datos_escenario()
         self.configurar_envio_datos()
-        
         self.configure_row_colors()
-
 
     def configurar_envio_datos(self):
         data_sender = DataSender()
@@ -109,7 +104,7 @@ class VistaPrincipal:
                                 command=lambda: data_sender.enviar_datos(self.entries, self.dropdown, self.path, self.mostrar_vista_errores))
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
-    
+        self.button.config(state=tk.DISABLED)  
 
     def cargar_datos_escenario(self):
         try:
@@ -134,8 +129,8 @@ class VistaPrincipal:
 
         self.entries['Escenario Id'].delete(0, tk.END)
         self.entries['Escenario Id'].insert(0, now_str)
-        self.entries['Escenario Id'].config(state="readonly")  # Bloquear la entrada de texto
-        self.entries['Escenario Id'].bind("<FocusIn>", lambda event: self.entries['Escenario Id'].config(state="readonly"))  # Bloquear la entrada de texto cuando el campo gana el foco
+        self.entries['Escenario Id'].config(state="readonly")  
+        self.entries['Escenario Id'].bind("<FocusIn>", lambda event: self.entries['Escenario Id'].config(state="readonly")) 
 
         with open("escenario_ids.csv", "a", newline='') as file:
             writer = csv.writer(file)
@@ -148,8 +143,12 @@ class VistaPrincipal:
         os.makedirs(universo_dir, exist_ok=True)
         os.makedirs(os.path.join(base_dir, 'timbrado'), exist_ok=True)
         subprocess.run(['explorer', universo_dir])
-
         self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, 'STATUS', 'NOXMLSCANDIDATOS', 'NOXMLSTIMBRADOS', 'NOXMLSERRONEOS', 'NOREVISION'))
+
+    def resetear_campos(self):
+        self.entries['Escenario Id'].delete(0, tk.END)
+        self.entries['Quincena No.'].delete(0, tk.END)
+        self.dropdown.set('')
 
     def configure_row_colors(self):
         self.table.tag_configure('oddrow', background='#E0E0F8')  # Color azul claro
@@ -161,7 +160,6 @@ class VistaPrincipal:
 
     def mostrar_vista_errores(self):
         if hasattr(self, 'new_window') and self.new_window.winfo_exists():
-            # Si la ventana de errores ya está abierta, no hacer nada
             return
         
         escenario_id = self.entries['Escenario Id'].get().strip()
@@ -174,7 +172,6 @@ class VistaPrincipal:
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
-
 
     def cerrar(self):
         self.master.destroy()
