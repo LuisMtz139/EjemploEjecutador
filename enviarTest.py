@@ -80,6 +80,12 @@ class DataSender:
                 df.to_excel(excel_path, index=False)
                 print("Archivo guardado. Filas con 'OK' eliminadas y columna previa a 'ID' eliminada.")
 
+                # Eliminar los archivos dentro de la carpeta 'erroneos'
+                for file in os.listdir(erroneos_dir):
+                    file_path = os.path.join(erroneos_dir, file)
+                    os.remove(file_path)
+                print("Contenido de la carpeta 'erroneos' eliminado.")
+
                 # Verificar si el DataFrame aún contiene filas y abrir el archivo Excel
                 if not df.empty:
                     os.startfile(excel_path)
@@ -91,5 +97,3 @@ class DataSender:
                 print("No se encontraron archivos Excel en la carpeta 'universo'.")
         else:
             print("No se encontró la carpeta 'universo' en la ruta especificada.")
-
-
