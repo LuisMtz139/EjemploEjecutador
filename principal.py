@@ -54,6 +54,9 @@ class VistaPrincipal:
             
         tk.Label(self.inner_frame, text="Registro Patronal", font=("Arial", 15)).grid(row=0, column=len(inputs), padx=20, sticky=tk.W)
 
+    
+        #agrega cuandots faltan por timbrar
+        
         options = ['ORDINARIA IMSSS', 'ORDINARIA ISSSTE', 'EXTRAORDINARIA IMSSS', 'EXTRAORDINARIA ISSSTE']
         self.dropdown = ttk.Combobox(self.inner_frame, values=options, font=("Arial", 15), state="readonly", style="Custom.TCombobox", width=30)
         self.dropdown.grid(row=1, column=len(inputs), padx=20, sticky=tk.W)
@@ -73,25 +76,21 @@ class VistaPrincipal:
         button2.grid(row=1, column=len(inputs)+1, padx=10, sticky=tk.E)
         
         self.table = ttk.Treeview(self.inner_frame)
-        self.table['columns'] = ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8')
+        self.table['columns'] = ('#1', '#2', '#3', '#4', '#5')
         self.table.column('#0', width=0, stretch=tk.NO)
         self.table.column('#1', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#2', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#3', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#4', width=150, stretch=tk.YES)
         self.table.column('#5', width=150, stretch=tk.YES)
-        self.table.column('#6', width=150, stretch=tk.YES)
-        self.table.column('#7', width=150, stretch=tk.YES)
-        self.table.column('#8', width=150, stretch=tk.YES)
+
 
         self.table.heading('#1', text='ESCENARIO ID', anchor='center')
         self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
         self.table.heading('#4', text='STATUS')
-        self.table.heading('#5', text='NOXMLSCANDIDATOS')
-        self.table.heading('#6', text='NOXMLSTIMBRADOS')
-        self.table.heading('#7', text='NOXMLSERRONEOS')
-        self.table.heading('#8', text='NOREVISION')
+        self.table.heading('#5', text='POR_TIMBRAR')
+
 
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
@@ -124,6 +123,7 @@ class VistaPrincipal:
                         self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', '', '', '', ''))
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
+            
 
     def crear_escenario(self):
         now = datetime.now()

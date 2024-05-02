@@ -6,7 +6,7 @@ from tkinter import Scrollbar
 import os
 import xml.etree.ElementTree as ET
 import urllib.parse
-
+import xml.etree.ElementTree as ET
 from enviarTest import DataSender
 
 import shutil
@@ -29,7 +29,9 @@ class TableError:
         self.config_path = self.load_config_path()
         self.create_scenario_directory(self.escenario_id)
         self.list_directory_contents()
-
+        
+        #agrega cuandots faltan por timbrar
+        
         self.main_frame = tk.Frame(master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
         
@@ -92,13 +94,13 @@ class TableError:
             print(f"Archivo seleccionado: {seleccion}")
             archivo_seleccionado_path = os.path.join(self.config_path, self.escenario_id, 'universo', seleccion)
             error_file_path = os.path.join(self.config_path, self.escenario_id, 'erroneos', 'errortimbrado.txt')
-            error_line = "No se encontró información para el archivo"  # Mensaje predeterminado si no se encuentra la línea
+            error_line = "No se encontró información para el archivo"  
             try:
                 with open(error_file_path, 'r') as file:
                     for line in file:
                         parts = line.split('|')
                         if len(parts) > 4 and os.path.basename(parts[4].strip()) == seleccion:
-                            error_line = f"Error identificado: {line.strip()}"  # Actualizar el mensaje con la línea de error
+                            error_line = f"Error identificado: {line.strip()}" 
                             break
                     else:
                         error_line = f"No se encontró información para el archivo '{seleccion}' en errortimbrado.txt"
@@ -128,7 +130,6 @@ class TableError:
             self.error_text.insert(tk.END, "No hay archivo seleccionado.")
 
     def setup_text_widget(self):
-        # Guarda cambios en el texto 1 segundo después de que el usuario deje de escribir
         self.error_text.bind("<KeyRelease>", self.on_key_release)
 
     def on_key_release(self, event):
@@ -147,9 +148,8 @@ class TableError:
                 print(f"Cambios guardados en {archivo_seleccionado_path}")
                 # Marcar el archivo como editado
                 self.files_edited[seleccion] = True
-                # Verificar si todos los archivos han sido editados
                 if all(self.files_edited.values()):
-                    self.button.config(state=tk.NORMAL)  # Activar el botón de Test
+                    self.button.config(state=tk.NORMAL) 
             except Exception as e:
                 print(f"Error al guardar cambios en {archivo_seleccionado_path}: {e}")
 
@@ -210,7 +210,6 @@ class TableError:
 
     def execute_test(self):
         try:
-            # Elimina el contenido de la carpeta de errores antes de ejecutar el test
             self.eliminar_carpeta_erroneos()
 
             entries = {
@@ -219,17 +218,13 @@ class TableError:
             }
             dropdown = tk.StringVar(value=self.registro_patronal_text)
             
-            # Crear la instancia de DataSender
             data_sender = DataSender()
             
-            # Configura un callback dummy para mostrar errores si no está definido
             def dummy_mostrar_errores():
                 print("Mostrar vista de errores llamada")
             
-            # Llama al método enviar_datos con los parámetros necesarios
             data_sender.enviar_datos(entries, dropdown, self.config_path, dummy_mostrar_errores)
             
-            # Después de finalizar el test, revisa los resultados y actualiza la columna de errores
             self.actualizar_columna_errores_despues_del_test()
 
         except Exception as e:
@@ -244,7 +239,6 @@ class TableError:
                 if errores:
                     self.actualizar_columna_error(errores)
                 else:
-                    # No hay errores, puedes cerrar la ventana
                     self.actualizar_columna_error("No se encontraron errores en errortimbrado.txt.")
                     self.cerrar_ventana()
         else:
