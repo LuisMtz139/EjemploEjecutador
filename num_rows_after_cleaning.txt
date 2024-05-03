@@ -1,9 +1,0 @@
-Escenario ID: 050220242319
-Nï¿½mero de filas limpiadas: 5
-
-Escenario ID: 050220242323
-Número de filas limpiadas: 1
-
-Escenario ID: 050220242334
-Número de filas limpiadas: 1
-

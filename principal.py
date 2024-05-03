@@ -25,6 +25,7 @@ class VistaPrincipal:
     def __init__(self, master):
         self.master = master
         self.master.title("Conalep-timbrado")
+        self.num_filas = 0
         
         tree = ET.parse('config.xml')
         root = tree.getroot()
@@ -104,12 +105,25 @@ class VistaPrincipal:
         self.num_rows_cleaned = {}
 
     def configurar_envio_datos(self):
-        data_sender = DataSender()
         self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado",
-                                command=lambda: data_sender.enviar_datos(self.entries, self.dropdown, self.path, self.mostrar_vista_errores))
+                                command=self.iniciar_proceso_de_timbrado)
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
-        self.button.config(state=tk.DISABLED)  
+        self.button.config(state=tk.DISABLED)
+
+        # Agregar un observador al estado del botón
+        self.button_state = tk.StringVar()
+        self.button_state.trace('w', self.on_button_state_change)
+        self.button_state.set(self.button['state'])
+
+    def iniciar_proceso_de_timbrado(self):
+        data_sender = DataSender()
+        data_sender.enviar_datos(self.entries, self.dropdown, self.path, self.mostrar_vista_errores)
+        self.cargar_datos_escenario()
+
+    def on_button_state_change(self, *args):
+        if self.button_state.get() == 'normal':
+            self.cargar_datos_escenario()
 
     def obtener_num_filas_limpiadas(self, escenario_id):
         self.filas_limpiadas = {}  # initialize the dictionary
@@ -128,6 +142,10 @@ class VistaPrincipal:
         return 0
         
     def cargar_datos_escenario(self):
+        # Primero, borra los datos existentes de la tabla:
+        for row in self.table.get_children():
+            self.table.delete(row)
+
         try:
             with open("escenario_ids.csv", "r", newline='') as file:
                 reader = csv.reader(file)
@@ -136,12 +154,17 @@ class VistaPrincipal:
                         escenario_id = row[0]
                         quincena_no = row[2] if len(row) > 2 else ''
                         registro_patronal = row[3] if len(row) > 3 else ''
-                        #mandar a llmar a comparar_escenario_ids
+                        # Mandar a llamar a comparar_escenario_ids
                         comparar = self.comparar_escenario_ids()
-                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', comparar))
+                        print('comparar', comparar)  
+                        # Si el escenario_id está en comparar, obtener su num_filas
+                        if escenario_id in comparar:
+                            num_filas = comparar[escenario_id]
+                            print('escenario_id_comparar', escenario_id)
+                            print('num_filas', num_filas)
+                            self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', num_filas))
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
-        #self.comparar_escenario_ids()
     
 
     def obtener_num_rows(self):
@@ -169,52 +192,49 @@ class VistaPrincipal:
             print("El archivo no existe.")
             
     def comparar_escenario_ids(self):
-        print("Comparando valores del Escenario ID entre el archivo de texto y el archivo CSV...")
-        
-        valores_texto = {}  # Almacenar los valores del archivo de texto y el número de filas limpiadas
-        valores_csv = set()  # Almacenar los valores del archivo CSV
-        
-        # Obtener los valores del archivo de texto
-        print("Obteniendo valores del archivo de texto...")
-        try:
-            with open('num_rows_after_cleaning.txt', 'r') as file:
-                for line in file:
-                    if line.startswith("Escenario ID:"):
-                        escenario_id = line.split(":")[1].strip()
-                        num = next(file).split(":")[1].strip()  # Obtener el número de filas limpiadas de la siguiente línea
-                        valores_texto[escenario_id] = num
-                        print(f"Escenario ID del archivo de texto: {escenario_id}, aaaaaaNúmero de filas limpiadas: {num}")
-                        return num
-        except FileNotFoundError:
-            print("El archivo de texto no existe.")
-            return None
-        
-        # Obtener los valores del archivo CSV
-        print("Obteniendo valores del archivo CSV...")
-        try:
-            with open("escenario_ids.csv", "r", newline='') as file:
-                reader = csv.reader(file)
-                for row in reader:
-                    if row: 
-                        primer_valor = row[0]
-                        valores_csv.add(primer_valor)
-                        print(f"Primer valor del archivo CSV: {primer_valor}")
-        except FileNotFoundError:
-            print("El archivo CSV no existe.")
-            return None
-        
-        # Encontrar los valores comunes
-        valores_comunes = set(valores_texto.keys()).intersection(valores_csv)
-        
-        if valores_comunes:
-            print("Valores presentes tanto en el archivo de texto como en el archivo CSV:")
-            for valor in valores_comunes:
-                print(f"Escenario ID: {valor}, Número de filas limpiadas: {valores_texto[valor]}")
-        else:
-            print("No hay valores comunes entre el archivo de texto y el archivo CSV.")
-            return None
-
-
+            print("Comparando valores del Escenario ID entre el archivo de texto y el archivo CSV...")
+            
+            valores_texto = {}  # Almacenar los valores del archivo de texto y el número de filas limpiadas
+            valores_csv = set()  # Almacenar los valores del archivo CSV
+            
+            # Obtener los valores del archivo de texto
+            print("Obteniendo valores del archivo de texto...")
+            try:
+                with open('num_rows_after_cleaning.txt', 'r') as file:
+                    for line in file:
+                        if line.startswith("Escenario ID:"):
+                            escenario_id = line.split(":")[1].strip()
+                            num = next(file).split(":")[1].strip()  # Obtener el número de filas limpiadas de la siguiente línea
+                            valores_texto[escenario_id] = num
+                            print(f"Escenario ID del archivo de texto: {escenario_id}, aaaaaaNúmero de filas limpiadas: {num}")
+                    return valores_texto
+            except FileNotFoundError:
+                print("El archivo de texto no existe.")
+            
+            # Obtener los valores del archivo CSV
+            print("Obteniendo valores del archivo CSV...")
+            try:
+                with open("escenario_ids.csv", "r", newline='') as file:
+                    reader = csv.reader(file)
+                    for row in reader:
+                        if row: 
+                            primer_valor = row[0]
+                            valores_csv.add(primer_valor)
+                            print(f"Primer valor del archivo CSV: {primer_valor}")
+            except FileNotFoundError:
+                print("El archivo CSV no existe.")
+                return None
+            
+            # Encontrar los valores comunes
+            valores_comunes = set(valores_texto.keys()).intersection(valores_csv)
+            
+            if valores_comunes:
+                print("Valores presentes tanto en el archivo de texto como en el archivo CSV:")
+                for valor in valores_comunes:
+                    print(f"Escenario ID: {valor}, Número de filas limpiadas: {valores_texto[valor]}")
+            else:
+                print("No hay valores comunes entre el archivo de texto y el archivo CSV.")
+                return None
             
     def agrupar_valores(self):
         # Crear diccionario para almacenar los valores agrupados
@@ -294,11 +314,11 @@ class VistaPrincipal:
         registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
 
         self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal_text, '', '', '', '', ''))
-
-        if hasattr(self, 'num_filas'):
-            print(f"Número de filas limpiadas: {self.num_filas}")  # print the number of cleaned rows
-        else:
-            print("num_filas is not set")
+        
+        # Update num_filas with the number of cleaned rows for the given escenario_id
+        self.num_filas = self.obtener_num_filas_limpiadas(escenario_id)
+        
+        print(f"Número de filas limpiadas: {self.num_filas}")  # print the number of cleaned rows
 
         self.new_window = tk.Toplevel(self.master)
         self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal_text)

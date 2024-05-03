@@ -34,3 +34,71 @@ Escenario ID: 050220242339
 Quincena No.: 43
 Registro Patronal: ORDINARIA IMSSS
 
+Escenario ID: 050220242340
+Quincena No.: 2
+Registro Patronal: ORDINARIA ISSSTE
+
+Escenario ID: 050220242352
+Quincena No.: 43
+Registro Patronal: ORDINARIA ISSSTE
+
+Escenario ID: 050320240005
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240006
+Quincena No.: 09
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240006
+Quincena No.: 09
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240008
+Quincena No.: 43
+Registro Patronal: ORDINARIA ISSSTE
+
+Escenario ID: 050320240013
+Quincena No.: 43
+Registro Patronal: ORDINARIA IMSSS
+
+Escenario ID: 050320240013
+Quincena No.: 43
+Registro Patronal: ORDINARIA IMSSS
+
+Escenario ID: 050320240015
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240015
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240016
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240016
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240023
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240023
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240023
+Quincena No.: 43
+Registro Patronal: EXTRAORDINARIA IMSSS
+
+Escenario ID: 050320240033
+Quincena No.: 43
+Registro Patronal: ORDINARIA ISSSTE
+
+Escenario ID: 050320240040
+Quincena No.: 43
+Registro Patronal: ORDINARIA ISSSTE
+

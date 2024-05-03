@@ -75,25 +75,6 @@ class DataSender:
                     print("Archivo Excel abierto para edición.")
                 else:
                     print("No hay datos para mostrar en el archivo Excel.")
-                    
-                num_rows_after_cleaning = df.shape[0]
-                print("Número de filas en el archivo Excel después de eliminar 'OK' y la columna previa a 'ID':", num_rows_after_cleaning)
-
-                # Eliminar valores previos con el mismo escenario_id del archivo de texto
-                with open('num_rows_after_cleaning.txt', 'r') as file:
-                    lines = file.readlines()
-                
-                with open('num_rows_after_cleaning.txt', 'w') as file:
-                    for line in lines:
-                        if not line.startswith(f"Escenario ID: {escenario_id}"):
-                            file.write(line)
-                    
-                    # Escribir el último valor
-                    file.write(f"Escenario ID: {escenario_id}\n")
-                    file.write(f"Número de filas limpiadas: {num_rows_after_cleaning}\n")
-                    file.write("\n")  # Agregar una línea en blanco para separar los registros
-
-                print("Información actualizada en 'num_rows_after_cleaning.txt'.")
 
             else:
                 print("No se encontraron archivos Excel en la carpeta 'universo'.")
@@ -103,10 +84,3 @@ class DataSender:
         if any(file.endswith('.txt') for file in files):
             print("Mostrar vista de errores")
             mostrar_vista_errores()
-
-        # Almacenar los valores en un archivo de registro
-        with open('data_sender_log.txt', 'a') as log_file:
-            log_file.write(f"Escenario ID: {escenario_id}\n")
-            log_file.write(f"Quincena No.: {quincena_no}\n")
-            log_file.write(f"Registro Patronal: {registro_patronal}\n")
-            log_file.write("\n")  # Agregar una línea en blanco para separar los registros
