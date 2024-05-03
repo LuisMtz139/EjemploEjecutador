@@ -15,6 +15,19 @@ class DataSender:
         escenario_id = entries['Escenario Id'].get().strip()
         quincena_no = entries['Quincena No.'].get().strip()
         registro_patronal = dropdown.get().strip()
+        erroneos_dir = os.path.join(path, escenario_id, 'erroneos')
+        
+        
+        
+        if os.listdir(erroneos_dir):
+                        print("Se encontraron erssssssrores.", erroneos_dir)
+                        #imprimr el contendio de la carpeta erroneos
+                        print("Contenido de la carpeta 'erroneos':", os.listdir(erroneos_dir))
+                        #eliminar el contenido de la carpeta erroneos   
+                        for file in os.listdir(erroneos_dir):
+                            os.remove(os.path.join(erroneos_dir, file))
+        else:
+                        print("No se encontraron errores.")
 
         escenario_id_encoded = urllib.parse.quote(escenario_id)
         quincena_no_encoded = urllib.parse.quote(quincena_no)
@@ -24,7 +37,7 @@ class DataSender:
         full_url = f"{base_url}/{escenario_id_encoded}/{quincena_no_encoded}/{registro_patronal_encoded}/N"
 
         print("URL completa:", full_url)
-        
+            
 
         universo_path = os.path.join(path, escenario_id, 'universo')
         if os.path.exists(universo_path):
@@ -96,9 +109,23 @@ class DataSender:
 
                 if not df.empty:
                     os.startfile(excel_path)
+                    print('path', excel_path)
                     print("Archivo Excel abierto para edición.")
+                    
+                    erroneos_dir = os.path.join(path, escenario_id, 'erroneos')
+                    if os.listdir(erroneos_dir):
+                        print("Se encontraron erssssssrores.", erroneos_dir)
+                        #imprimr el contendio de la carpeta erroneos
+                        print("Contenido de la carpeta 'erroneos':", os.listdir(erroneos_dir))
+                        #abrrir el arhcivo errortimbrado.txt
+                        os.startfile(os.path.join(erroneos_dir, 'errortimbrado.txt'))
+                    else:
+                        print("No se encontraron errores.")
+                    universo_path = os.path.join(path, escenario_id, 'universo')
                 else:
                     print("No hay datos para mostrar en el archivo Excel.")
+                    
+                
                     
                 num_rows_after_cleaning = df.shape[0]
                 print("Número de filas en el archivo Excel después de eliminar 'OK' y la columna previa a 'ID':", num_rows_after_cleaning)

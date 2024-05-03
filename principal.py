@@ -77,19 +77,17 @@ class VistaPrincipal:
         button2.grid(row=1, column=len(inputs)+1, padx=10, sticky=tk.E)
         
         self.table = ttk.Treeview(self.inner_frame)
-        self.table['columns'] = ('#1', '#2', '#3', '#4', '#5')
+        self.table['columns'] = ('#1', '#2', '#3', '#4')
         self.table.column('#0', width=0, stretch=tk.NO)
         self.table.column('#1', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#2', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#3', width=150, stretch=tk.YES, anchor='center')
         self.table.column('#4', width=150, stretch=tk.YES)
-        self.table.column('#5', width=150, stretch=tk.YES)
 
         self.table.heading('#1', text='ESCENARIO ID', anchor='center')
         self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
-        self.table.heading('#4', text='STATUS')
-        self.table.heading('#5', text='POR_TIMBRAR')
+        self.table.heading('#4', text='POR_TIMBRAR')
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
@@ -98,8 +96,6 @@ class VistaPrincipal:
         self.configurar_envio_datos()
         self.configure_row_colors()
 
-
-        # Crear un diccionario para almacenar el número de filas limpiadas por Escenario ID
         self.num_rows_cleaned = {}
 
     def configurar_envio_datos(self):
@@ -140,7 +136,6 @@ class VistaPrincipal:
         return 0
         
     def cargar_datos_escenario(self):
-        # Primero, borra los datos existentes de la tabla:
         for row in self.table.get_children():
             self.table.delete(row)
 
@@ -156,25 +151,24 @@ class VistaPrincipal:
                         status = row[4] if len(row) > 4 else ''
                         # Mandar a llamar a comparar_escenario_ids
                         comparar = self.comparar_escenario_ids()
-                        print('comparar', comparar)  
+                        #print('comparar', comparar)  
                         # Si el escenario_id está en comparar, obtener su num_filas
                         if escenario_id in comparar:
                             num_filas = comparar[escenario_id]
-                            print('escenario_id_comparar', escenario_id)
-                            print('num_filas', num_filas)
+                            #print('escenario_id_comparar', escenario_id)
+                            #print('num_filas', num_filas)
                         if not num_filas:  # Si num_filas está vacío
-                            print('aaaaaaaaaaaaaaaaaaaaaddddddddddd', status)
+                            #print('', status)
                             num_filas = status
                         else:  # Si num_filas no está vacío
-                            print('aaaaaaaaaaaaaaaaaaaaaaaa,', num_filas)
+                            print( num_filas)
 
                         # Insertar en la tabla
-                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', num_filas))
+                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, num_filas))
                     
-            # Mostrar todos los datos en la tabla:
             for row in self.table.get_children():
                 values = self.table.item(row, 'values')
-                print("Datos en la tabla:", values)
+                #print("Datos en la tabla:", values)
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
 
@@ -203,13 +197,12 @@ class VistaPrincipal:
             print("El archivo no existe.")
             
     def comparar_escenario_ids(self):
-            print("Comparando valores del Escenario ID entre el archivo de texto y el archivo CSV...")
+            #print("Comparando valores del Escenario ID entre el archivo de texto y el archivo CSV...")
             
             valores_texto = {}  # Almacenar los valores del archivo de texto y el número de filas limpiadas
             valores_csv = set()  # Almacenar los valores del archivo CSV
             
-            # Obtener los valores del archivo de texto
-            print("Obteniendo valores del archivo de texto...")
+            #print("Obteniendo valores del archivo de texto...")
             try:
                 with open('num_rows_after_cleaning.txt', 'r') as file:
                     for line in file:
@@ -217,13 +210,12 @@ class VistaPrincipal:
                             escenario_id = line.split(":")[1].strip()
                             num = next(file).split(":")[1].strip()  # Obtener el número de filas limpiadas de la siguiente línea
                             valores_texto[escenario_id] = num
-                            print(f"Escenario ID del archivo de texto: {escenario_id}, aaaaaaNúmero de filas limpiadas: {num}")
+                            #print(f"Escenario ID del archivo de texto: {escenario_id}, aaaaaaNúmero de filas limpiadas: {num}")
                     return valores_texto
             except FileNotFoundError:
                 print("El archivo de texto no existe.")
             
-            # Obtener los valores del archivo CSV
-            print("Obteniendo valores del archivo CSV...")
+           # print("Obteniendo valores del archivo CSV...")
             try:
                 with open("escenario_ids.csv", "r", newline='') as file:
                     reader = csv.reader(file)
@@ -236,7 +228,6 @@ class VistaPrincipal:
                 print("El archivo CSV no existe.")
                 return None
             
-            # Encontrar los valores comunes
             valores_comunes = set(valores_texto.keys()).intersection(valores_csv)
             
             if valores_comunes:
@@ -248,10 +239,8 @@ class VistaPrincipal:
                 return None
             
     def agrupar_valores(self):
-        # Crear diccionario para almacenar los valores agrupados
         valores_agrupados = {}
 
-        # Obtener los valores de 'num_rows_after_cleaning.txt'
         try:
             with open('num_rows_after_cleaning.txt', 'r') as file:
                 for line in file:
@@ -261,7 +250,6 @@ class VistaPrincipal:
         except FileNotFoundError:
             print("El archivo num_rows_after_cleaning.txt no se encontró.")
 
-        # Obtener los valores de 'escenario_ids.csv'
         try:
             with open("escenario_ids.csv", "r", newline='') as file:
                 reader = csv.reader(file)
@@ -272,7 +260,6 @@ class VistaPrincipal:
         except FileNotFoundError:
             print("El archivo escenario_ids.csv no existe.")
 
-        # Imprimir los valores agrupados
         for key, value in valores_agrupados.items():
             print(f"Valor: {key}, Apariciones: {len(value)}")
 
@@ -300,7 +287,7 @@ class VistaPrincipal:
         os.makedirs(universo_dir, exist_ok=True)
         os.makedirs(os.path.join(base_dir, 'timbrado'), exist_ok=True)
         subprocess.run(['explorer', universo_dir])
-        self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, '', ''))
+        self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, ''))
 
 
     def configure_row_colors(self):
@@ -330,17 +317,13 @@ class VistaPrincipal:
         self.master.destroy()
         
     def resetear_campos(self):
-        # Limpiar todos los campos de entrada
         for entry in self.entries.values():
             entry.delete(0, tk.END)
         
-        # Limpiar la selección del combobox
         self.dropdown.set('')
         
-        # Limpiar el campo de entrada del "Escenario Id"
         self.entries['Escenario Id'].config(state=tk.NORMAL)
         self.entries['Escenario Id'].delete(0, tk.END)
-
 
 def main():
     root = tk.Tk()
