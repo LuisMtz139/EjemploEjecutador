@@ -89,14 +89,12 @@ class VistaPrincipal:
         self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
         self.table.heading('#4', text='STATUS')
-        self.table.heading('#5', text='POR_TIMBRAR', anchor='center')
-
+        self.table.heading('#5', text='POR_TIMBRAR')
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
 
         self.cargar_datos_escenario()
-
         self.configurar_envio_datos()
         self.configure_row_colors()
 
@@ -151,9 +149,11 @@ class VistaPrincipal:
                 reader = csv.reader(file)
                 for row in reader:
                     if row: 
+                        num_filas = ''  # Inicializar num_filas en cada iteración del bucle
                         escenario_id = row[0]
                         quincena_no = row[2] if len(row) > 2 else ''
                         registro_patronal = row[3] if len(row) > 3 else ''
+                        status = row[4] if len(row) > 4 else ''
                         # Mandar a llamar a comparar_escenario_ids
                         comparar = self.comparar_escenario_ids()
                         print('comparar', comparar)  
@@ -162,10 +162,21 @@ class VistaPrincipal:
                             num_filas = comparar[escenario_id]
                             print('escenario_id_comparar', escenario_id)
                             print('num_filas', num_filas)
-                            self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', num_filas))
+                        if not num_filas:  # Si num_filas está vacío
+                            print('aaaaaaaaaaaaaaaaaaaaaddddddddddd', status)
+                            num_filas = status
+                        else:  # Si num_filas no está vacío
+                            print('aaaaaaaaaaaaaaaaaaaaaaaa,', num_filas)
+
+                        # Insertar en la tabla
+                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', num_filas))
+                    
+            # Mostrar todos los datos en la tabla:
+            for row in self.table.get_children():
+                values = self.table.item(row, 'values')
+                print("Datos en la tabla:", values)
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
-    
 
     def obtener_num_rows(self):
         print('obtner valores txt')
@@ -266,7 +277,6 @@ class VistaPrincipal:
             print(f"Valor: {key}, Apariciones: {len(value)}")
 
 
-
     def crear_escenario(self):
         now = datetime.now()
         now_str = now.strftime("%m%d%Y%H%M")
@@ -290,10 +300,7 @@ class VistaPrincipal:
         os.makedirs(universo_dir, exist_ok=True)
         os.makedirs(os.path.join(base_dir, 'timbrado'), exist_ok=True)
         subprocess.run(['explorer', universo_dir])
-        
-        
-
-
+        self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, '', ''))
 
 
     def configure_row_colors(self):
@@ -303,29 +310,20 @@ class VistaPrincipal:
         for i, row in enumerate(self.table.get_children()):
             tag = 'oddrow' if i % 2 == 0 else 'evenrow'
             self.table.item(row, tags=(tag,))
-
-    def mostrar_vista_errores(self,):
+    def mostrar_vista_errores(self):
         if hasattr(self, 'new_window') and self.new_window.winfo_exists():
             return
-
+        
         escenario_id = self.entries['Escenario Id'].get().strip()
         quincena_no = self.entries['Quincena No.'].get().strip()
         registro_patronal_text = self.dropdown.get().strip()
         registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
-
-        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal_text, '', '', '', '', ''))
-        
-        # Update num_filas with the number of cleaned rows for the given escenario_id
-        self.num_filas = self.obtener_num_filas_limpiadas(escenario_id)
-        
-        print(f"Número de filas limpiadas: {self.num_filas}")  # print the number of cleaned rows
 
         self.new_window = tk.Toplevel(self.master)
         self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal_text)
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
-        
 
 
     def cerrar(self):
