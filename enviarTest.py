@@ -40,25 +40,32 @@ class DataSender:
             
 
         universo_path = os.path.join(path, escenario_id, 'universo')
-        if os.path.exists(universo_path):
-            files = os.listdir(universo_path)
-            num_files = len(files)
-            print("Número de archivos en la carpeta 'universo':", num_files)
+        with open('escenario_ids.csv', 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            lines = list(csv_reader)
 
-            # Leer el archivo CSV
-            with open('escenario_ids.csv', 'r') as csv_file:
-                csv_reader = csv.reader(csv_file)
-                lines = list(csv_reader)
+            if os.path.exists(universo_path):
+                files = os.listdir(universo_path)
+                txt_files = [file for file in files if file.endswith('.txt')]
+                num_txt_files = len(txt_files)
+                print("Número de archivos .txt en la carpeta 'universo':", num_txt_files)
 
-            # Agregar el número de archivos a la última línea
-            lines[-1].append(num_files)
+                # Modificar la última línea
+                last_line = lines[-1]
 
-            # Escribir las líneas modificadas de vuelta al archivo CSV
-            with open('escenario_ids.csv', 'w', newline='') as csv_file:
-                csv_writer = csv.writer(csv_file)
-                csv_writer.writerows(lines)
-        else:
-            print("No se encontró la carpeta 'universo' en la ruta especificada.")
+                # Asegurarse de que last_line tenga al menos 5 elementos
+                while len(last_line) < 5:
+                    last_line.append('')
+
+                last_line[4] = num_txt_files  # Reemplazar el valor en la posición 4 con num_txt_files
+            else:
+                print("No se encontró la carpeta 'universo' en la ruta especificada.")
+
+        # Escribir las líneas modificadas de vuelta al archivo CSV
+        with open('escenario_ids.csv', 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerows(lines[:-1])  # Escribe todas las líneas excepto la última
+            csv_writer.writerow(last_line)  # Escribe la última línea modificada
 
         try:
             response = requests.get(full_url)
@@ -78,9 +85,43 @@ class DataSender:
         universo_path = os.path.join(path, escenario_id, 'universo')
         print("Explorando la carpeta:", universo_path)
 
+
         if os.path.exists(universo_path):
             files = os.listdir(universo_path)
             print("Contenido de la carpeta 'universo':", files)
+
+            txt_files = [file for file in files if file.endswith('.txt')]
+            num = len(txt_files)
+            print("Número de archivos .txt en la carpeta 'universo':", num)
+
+            # Leer el archivo CSV, reemplazar el valor en la posición 4 con num y escribir las filas de nuevo en el archivo
+            # Leer el archivo CSV, reemplazar el valor en la posición 4 con num y escribir las filas de nuevo en el archivo
+            with open('escenario_ids.csv', 'r') as file:
+                reader = csv.reader(file)
+                rows = list(reader)
+
+            last_row = rows[-1]  # Obtener la última fila
+
+            # Asegurarse de que last_row tenga al menos 5 elementos
+            while len(last_row) < 5:
+                last_row.append('')
+
+            last_row[4] = num  # Reemplazar el valor en la posición 4 con num
+
+            with open('escenario_ids.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(rows[:-1])  # Escribe todas las líneas excepto la última
+                writer.writerow(last_row)  # Escribe la última línea modificada
+
+            # Si hay archivos txt en la carpeta universo, entonces se debe de abrir el archivo txt
+            if num > 0:
+                print("Mostrar vista de errores")
+                mostrar_vista_errores()
+            else:
+                print("No se encontraron errores.")
+
+            
+            
             excel_files = [file for file in files if file.endswith('.xlsx')]
             if excel_files:
                 excel_path = os.path.join(universo_path, excel_files[0])
