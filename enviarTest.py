@@ -93,16 +93,12 @@ class DataSender:
             txt_files = [file for file in files if file.endswith('.txt')]
             num = len(txt_files)
             print("Número de archivos .txt en la carpeta 'universo':", num)
-
-            # Leer el archivo CSV, reemplazar el valor en la posición 4 con num y escribir las filas de nuevo en el archivo
-            # Leer el archivo CSV, reemplazar el valor en la posición 4 con num y escribir las filas de nuevo en el archivo
             with open('escenario_ids.csv', 'r') as file:
                 reader = csv.reader(file)
                 rows = list(reader)
 
             last_row = rows[-1]  # Obtener la última fila
 
-            # Asegurarse de que last_row tenga al menos 5 elementos
             while len(last_row) < 5:
                 last_row.append('')
 

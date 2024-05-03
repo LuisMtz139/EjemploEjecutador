@@ -134,6 +134,14 @@ class VistaPrincipal:
         except ValueError:
             print("Error al leer el número de filas limpiadas para el Escenario ID:", escenario_id)
         return 0
+    def check_and_refresh_table(self):
+        rows = self.table.get_children()
+        if not rows:
+            return
+        last_row = rows[-1]
+        por_timbrar_value = self.table.item(last_row, 'values')[3]
+        if por_timbrar_value == '0':
+            self.cargar_datos_escenario()
         
     def cargar_datos_escenario(self):
         for row in self.table.get_children():
@@ -324,6 +332,10 @@ class VistaPrincipal:
         
         self.entries['Escenario Id'].config(state=tk.NORMAL)
         self.entries['Escenario Id'].delete(0, tk.END)
+        
+    def refresh_table_periodically(self):
+        self.check_and_refresh_table()
+        self.master.after(1000, self.refresh_table_periodically)  # Call this method again after 1000 milliseconds
 
 def main():
     root = tk.Tk()
