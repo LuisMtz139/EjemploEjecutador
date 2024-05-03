@@ -240,17 +240,24 @@ class TableError:
         self.master.destroy()
 
     
-    def mostrar_vista_errores(self):
-        escenario_id = self.escenario_id
-        quincena_no = self.quincena_no
-        registro_patronal_text = self.registro_patronal
+    def mostrar_vista_errores(self, num_rows_after_cleaning):
+        if hasattr(self, 'new_window') and self.new_window.winfo_exists():
+            return
+        
+        escenario_id = self.entries['Escenario Id'].get().strip()
+        quincena_no = self.entries['Quincena No.'].get().strip()
+        registro_patronal_text = self.dropdown.get().strip()
         registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
+
+        # Actualizar la columna POR_TIMBRAR de la tabla con el valor recibido
+        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal_text, '', '', '', num_rows_after_cleaning, ''))
         
         self.new_window = tk.Toplevel(self.master)
-        self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal)
+        self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal_text)
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
+
         
 
     def list_directory_contents(self):

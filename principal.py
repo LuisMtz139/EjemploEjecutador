@@ -1,7 +1,7 @@
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
-from tkinter import StringVar  # Importar StringVar para poder asociarlo con el Entry
+from tkinter import StringVar
 import os
 import xml.etree.ElementTree as ET
 import subprocess
@@ -22,7 +22,6 @@ class VistaPrincipal:
             self.button.config(state=tk.NORMAL)
         else:
             self.button.config(state=tk.DISABLED)
-
     def __init__(self, master):
         self.master = master
         self.master.title("Conalep-timbrado")
@@ -42,7 +41,8 @@ class VistaPrincipal:
 
         inputs = ['Escenario Id', 'Quincena No.']
         self.entries = {} 
-    
+        self.num_rows_cleaned = {}
+        
         for i, input_text in enumerate(inputs):
             tk.Label(self.inner_frame, text=input_text, font=("Arial", 15)).grid(row=0, column=i, padx=10)
             if input_text == 'Quincena No.':
@@ -88,15 +88,20 @@ class VistaPrincipal:
         self.table.heading('#2', text='QUINCENA NO.', anchor='center')
         self.table.heading('#3', text='TIPONOMINA', anchor='center')
         self.table.heading('#4', text='STATUS')
-        self.table.heading('#5', text='POR_TIMBRAR')
+        self.table.heading('#5', text='POR_TIMBRAR', anchor='center')
 
         style = ttk.Style()
         style.configure("Treeview.Heading", font=("Arial", 10))
         self.table.place(relx=0.5, rely=0.50, relwidth=0.99,relheight=0.7, anchor=tk.CENTER) 
 
         self.cargar_datos_escenario()
+
         self.configurar_envio_datos()
         self.configure_row_colors()
+
+
+        # Crear un diccionario para almacenar el número de filas limpiadas por Escenario ID
+        self.num_rows_cleaned = {}
 
     def configurar_envio_datos(self):
         data_sender = DataSender()
@@ -106,6 +111,22 @@ class VistaPrincipal:
         self.button.config(width=25, height=2, font=("Arial", 13))
         self.button.config(state=tk.DISABLED)  
 
+    def obtener_num_filas_limpiadas(self, escenario_id):
+        self.filas_limpiadas = {}  # initialize the dictionary
+        try:
+            with open('num_rows_after_cleaning.txt', 'r') as file:
+                for line in file:
+                    if line.startswith(f"Escenario ID: {escenario_id}"):
+                        self.num_filas = int(line.split(":")[-1].strip())
+                        self.filas_limpiadas[escenario_id] = self.num_filas  # store the number of cleaned rows in the dictionary
+                        #print(f"Escenario ID: {escenario_id}, Número de filas limpiadas: {self.num_filas}")
+                        return self.num_filas
+        except FileNotFoundError:
+            print("El archivo num_rows_after_cleaning.txt no se encontró.")
+        except ValueError:
+            print("Error al leer el número de filas limpiadas para el Escenario ID:", escenario_id)
+        return 0
+        
     def cargar_datos_escenario(self):
         try:
             with open("escenario_ids.csv", "r", newline='') as file:
@@ -115,10 +136,116 @@ class VistaPrincipal:
                         escenario_id = row[0]
                         quincena_no = row[2] if len(row) > 2 else ''
                         registro_patronal = row[3] if len(row) > 3 else ''
-                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', '', '', '', ''))
+                        #mandar a llmar a comparar_escenario_ids
+                        comparar = self.comparar_escenario_ids()
+                        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal, '', comparar))
         except FileNotFoundError:
             print("El archivo no existe, se creará al guardar un nuevo escenario.")
+        #self.comparar_escenario_ids()
+    
+
+    def obtener_num_rows(self):
+        print('obtner valores txt')
+        try:
+            with open('num_rows_after_cleaning.txt', 'r') as file:
+                for line in file:
+                    if line.startswith("Escenario ID:"):
+                        escenario_id = line.split(":")[1].strip()
+                        print(escenario_id)
+        except FileNotFoundError:
+            pass
+        return 0
+    
+    def leer_primero_valor_escenario_ids(self):
+        print('archivo csv')
+        try:
+            with open("escenario_ids.csv", "r", newline='') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if row: 
+                        primer_valor = row[0]
+                        print(primer_valor)
+        except FileNotFoundError:
+            print("El archivo no existe.")
             
+    def comparar_escenario_ids(self):
+        print("Comparando valores del Escenario ID entre el archivo de texto y el archivo CSV...")
+        
+        valores_texto = {}  # Almacenar los valores del archivo de texto y el número de filas limpiadas
+        valores_csv = set()  # Almacenar los valores del archivo CSV
+        
+        # Obtener los valores del archivo de texto
+        print("Obteniendo valores del archivo de texto...")
+        try:
+            with open('num_rows_after_cleaning.txt', 'r') as file:
+                for line in file:
+                    if line.startswith("Escenario ID:"):
+                        escenario_id = line.split(":")[1].strip()
+                        num = next(file).split(":")[1].strip()  # Obtener el número de filas limpiadas de la siguiente línea
+                        valores_texto[escenario_id] = num
+                        print(f"Escenario ID del archivo de texto: {escenario_id}, aaaaaaNúmero de filas limpiadas: {num}")
+                        return num
+        except FileNotFoundError:
+            print("El archivo de texto no existe.")
+            return None
+        
+        # Obtener los valores del archivo CSV
+        print("Obteniendo valores del archivo CSV...")
+        try:
+            with open("escenario_ids.csv", "r", newline='') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if row: 
+                        primer_valor = row[0]
+                        valores_csv.add(primer_valor)
+                        print(f"Primer valor del archivo CSV: {primer_valor}")
+        except FileNotFoundError:
+            print("El archivo CSV no existe.")
+            return None
+        
+        # Encontrar los valores comunes
+        valores_comunes = set(valores_texto.keys()).intersection(valores_csv)
+        
+        if valores_comunes:
+            print("Valores presentes tanto en el archivo de texto como en el archivo CSV:")
+            for valor in valores_comunes:
+                print(f"Escenario ID: {valor}, Número de filas limpiadas: {valores_texto[valor]}")
+        else:
+            print("No hay valores comunes entre el archivo de texto y el archivo CSV.")
+            return None
+
+
+            
+    def agrupar_valores(self):
+        # Crear diccionario para almacenar los valores agrupados
+        valores_agrupados = {}
+
+        # Obtener los valores de 'num_rows_after_cleaning.txt'
+        try:
+            with open('num_rows_after_cleaning.txt', 'r') as file:
+                for line in file:
+                    if line.startswith("Escenario ID:"):
+                        escenario_id = line.split(":")[1].strip()
+                        valores_agrupados.setdefault(escenario_id, [])
+        except FileNotFoundError:
+            print("El archivo num_rows_after_cleaning.txt no se encontró.")
+
+        # Obtener los valores de 'escenario_ids.csv'
+        try:
+            with open("escenario_ids.csv", "r", newline='') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if row: 
+                        primer_valor = row[0]
+                        valores_agrupados.setdefault(primer_valor, [])
+        except FileNotFoundError:
+            print("El archivo escenario_ids.csv no existe.")
+
+        # Imprimir los valores agrupados
+        for key, value in valores_agrupados.items():
+            print(f"Valor: {key}, Apariciones: {len(value)}")
+
+
 
     def crear_escenario(self):
         now = datetime.now()
@@ -143,12 +270,11 @@ class VistaPrincipal:
         os.makedirs(universo_dir, exist_ok=True)
         os.makedirs(os.path.join(base_dir, 'timbrado'), exist_ok=True)
         subprocess.run(['explorer', universo_dir])
-        self.table.insert('', 'end', values=(now_str, quincena_no, tipo_nomina, 'STATUS', 'NOXMLSCANDIDATOS', 'NOXMLSTIMBRADOS', 'NOXMLSERRONEOS', 'NOREVISION'))
+        
+        
 
-    def resetear_campos(self):
-        self.entries['Escenario Id'].delete(0, tk.END)
-        self.entries['Quincena No.'].delete(0, tk.END)
-        self.dropdown.set('')
+
+
 
     def configure_row_colors(self):
         self.table.tag_configure('oddrow', background='#E0E0F8')  # Color azul claro
@@ -158,23 +284,45 @@ class VistaPrincipal:
             tag = 'oddrow' if i % 2 == 0 else 'evenrow'
             self.table.item(row, tags=(tag,))
 
-    def mostrar_vista_errores(self):
+    def mostrar_vista_errores(self,):
         if hasattr(self, 'new_window') and self.new_window.winfo_exists():
             return
-        
+
         escenario_id = self.entries['Escenario Id'].get().strip()
         quincena_no = self.entries['Quincena No.'].get().strip()
         registro_patronal_text = self.dropdown.get().strip()
         registro_patronal = ''.join(re.findall(r'\d+', registro_patronal_text))
+
+        self.table.insert('', 'end', values=(escenario_id, quincena_no, registro_patronal_text, '', '', '', '', ''))
+
+        if hasattr(self, 'num_filas'):
+            print(f"Número de filas limpiadas: {self.num_filas}")  # print the number of cleaned rows
+        else:
+            print("num_filas is not set")
 
         self.new_window = tk.Toplevel(self.master)
         self.app = TableError(self.new_window, escenario_id, quincena_no, registro_patronal_text)
         window_x = self.master.winfo_x()
         window_y = self.master.winfo_y()
         self.new_window.geometry("+%d+%d" % (window_x, window_y))
+        
+
 
     def cerrar(self):
         self.master.destroy()
+        
+    def resetear_campos(self):
+        # Limpiar todos los campos de entrada
+        for entry in self.entries.values():
+            entry.delete(0, tk.END)
+        
+        # Limpiar la selección del combobox
+        self.dropdown.set('')
+        
+        # Limpiar el campo de entrada del "Escenario Id"
+        self.entries['Escenario Id'].config(state=tk.NORMAL)
+        self.entries['Escenario Id'].delete(0, tk.END)
+
 
 def main():
     root = tk.Tk()
