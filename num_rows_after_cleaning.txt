@@ -1,0 +1,22 @@
+Escenario ID: 050320241623
+Número de filas limpiadas: 1
+
+Número de filas limpiadas: 1
+
+Escenario ID: 050320241634
+Número de filas limpiadas: 0
+
+Escenario ID: 050320241635
+Número de filas limpiadas: 1
+
+Escenario ID: 050320241636
+Número de filas limpiadas: 1
+
+Escenario ID: 050320241706
+Número de filas limpiadas: 2
+
+Número de filas limpiadas: 1
+
+Escenario ID: 050320241731
+Número de filas limpiadas: 0
+

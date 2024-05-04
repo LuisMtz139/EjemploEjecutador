@@ -14,3 +14,136 @@ http://localhost:1234/RocencranService/Generanomina/  C:CFinalServiceQR|CCNE7812
 
 PRODUCCION
 http://localhost:1234/RocencranService/Generanomina/  C:CFinalServiceQR|CCNE781229BK4  /  IDDEESCENARIO  /  NOQUINCENA  /  REGISTRO PATRONAL  /  N  LA N INDICA QUE AHORA SI SE CREA XML Y PDF YA QUE ESTAMOS EN PRODUCCION
+
+
+
+
+
+
+
+
+Option Explicit
+Dim EmailsEnviados As Integer, OSF As FileSystemObject
+
+Private Sub CommandButton1_Click()
+  Dim Fichero As TextStream, LineaTxt As String, Val() As String, ValCont As Integer, icont As Integer, CadAux As String, Contador, Resp As String
+  On Error GoTo HELP1
+  Set OSF = New FileSystemObject
+  Set Fichero = OSF.OpenTextFile("C:\ConalepQna08\procesados.txt", ForReading)
+  EmailsEnviados = 1
+  Do While Not Fichero.AtEndOfLine
+    DoEvents
+    LineaTxt = Fichero.ReadLine
+    If EmailsEnviados >= 1 Then
+    'Damos tratamiento para saber el correo y datos del destinatario para enviarle el correo
+    icont = 1: ValCont = 0
+    Do While icont <= Len(LineaTxt)
+      DoEvents
+      If Not Mid(LineaTxt, icont, 1) = "|" Then
+        CadAux = CadAux & Mid(LineaTxt, icont, 1)
+      Else
+        ReDim Preserve Val(ValCont): Val(ValCont) = CadAux: ValCont = ValCont + 1: CadAux = ""
+      End If
+      icont = icont + 1
+    Loop
+    If Not Trim(CadAux) = "" Then
+      ReDim Preserve Val(ValCont): Val(ValCont) = CadAux: ValCont = ValCont + 1: CadAux = ""
+    End If
+    If ValCont = 6 Then
+      'Ya tenemos los parametros para conectar al administrador de correos y enviar forma masiva
+      If InStr(Val(5), "@") > 0 Then 'Trae correo valido
+        Resp = SENDnotification(Trim(Val(5)), Trim(Val(3)), Trim(Val(0)), Trim(Val(1)), Trim(Val(4)))
+        If Not Resp = "Ok" Then
+          MsgBox Resp
+          Exit Sub
+        End If
+      End If
+      '---------------------------------------------------------------------------------------
+    Else 'No viene el correo para enviar
+    
+    
+    End If
+    End If
+    EmailsEnviados = EmailsEnviados + 1
+  Loop
+  MsgBox "Proceso Terminado", vbOKOnly + vbExclamation, "Mensajero"
+  Exit Sub
+  
+HELP1:
+  Set OSF = Nothing: Set Fichero = Nothing
+  MsgBox "Se ha producido un error " & Err.Description, vbOKOnly + vbCritical, "Mensajero"
+End Sub
+
+
+Private Function SENDnotification(Destino As String, XmlPdf As String, Rfc As String, Nombre As String, Uuuid As String) As String
+  Dim ObjMessage As Object, icont As Integer
+  Set ObjMessage = CreateObject("CDO.Message")
+  ObjMessage.Subject = "QNA 08 CFDI " & XmlPdf & " de " & Rfc & " " & Nombre
+  ObjMessage.From = "<sendprediction@gmail.com>"
+  ObjMessage.To = Destino
+  ObjMessage.CC = "rocencran@hotmail.com"
+  ObjMessage.TextBody = "Estimado colaborador " & vbCrLf & vbCrLf & "Por medio de este conducto realizamos el envío del comprobante fiscal digital " & XmlPdf & " de su recibo de nómina." & vbCrLf & vbCrLf & vbCrLf & "COLEGIO NACIONAL DE EDUCACION PROFESIONAL TECNICA"
+  ObjMessage.AddAttachment "C:\ConalepQna08\" & Rfc & XmlPdf & ".xml"
+  ObjMessage.AddAttachment "C:\ConalepQna08\" & Rfc & XmlPdf & ".pdf"
+  If OSF.FileExists("C:\ConalepQna08\" & Rfc & XmlPdf & ".zip") Then
+    ObjMessage.AddAttachment "C:\ConalepQna08\" & Rfc & XmlPdf & ".zip"
+  End If
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "smtp-relay.brevo.com"
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/sendusername") = "sendprediction@gmail.com"
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "Tby1DqW2w7Cf3O5F"
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = "587"
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/smtpusessl") = False
+  ObjMessage.Configuration.Fields.Item _
+  ("http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout") = 60
+  ObjMessage.Configuration.Fields.Update
+  On Error Resume Next
+  ObjMessage.Send
+  If Err Then
+    Err.Clear: GoTo HELP1
+  End If
+  'SENDnotification = "Ok"
+  icont = 0
+  Do While icont < 2000
+    DoEvents
+    icont = icont + 1
+  Loop
+  SENDnotification = "Ok"
+  Exit Function
+
+HELP1:
+  SENDnotification = "Error en " & EmailsEnviados
+  Exit Function
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

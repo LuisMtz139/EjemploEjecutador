@@ -5,6 +5,8 @@ import urllib.parse
 import requests
 import xml.etree.ElementTree as ET
 
+from enviarCorreo import EnviarCorreo
+
 class DataSender:
     def __init__(self):
         tree = ET.parse('config.xml')
@@ -17,7 +19,7 @@ class DataSender:
         registro_patronal = dropdown.get().strip()
         erroneos_dir = os.path.join(path, escenario_id, 'erroneos')
         
-        
+    
         
         if os.listdir(erroneos_dir):
                         print("Se encontraron erssssssrores.", erroneos_dir)

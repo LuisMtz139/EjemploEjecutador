@@ -1,4 +1,5 @@
 from datetime import datetime
+import shutil
 import tkinter as tk
 from tkinter import ttk
 from tkinter import StringVar
@@ -6,6 +7,7 @@ import os
 import xml.etree.ElementTree as ET
 import subprocess
 import csv
+from enviarCorreo import EnviarCorreo
 from enviarTest import DataSender
 from tableError import TableError
 import re
@@ -99,16 +101,57 @@ class VistaPrincipal:
         self.num_rows_cleaned = {}
 
     def configurar_envio_datos(self):
-        self.button = tk.Button(self.main_frame, text="Iniciar Proceso de Timbrado",
+        self.button = tk.Button(self.main_frame, text="Timbrado",
                                 command=self.iniciar_proceso_de_timbrado)
         self.button.place(relx=0.1, rely=0.9, anchor=tk.CENTER)
         self.button.config(width=25, height=2, font=("Arial", 13))
         self.button.config(state=tk.DISABLED)
-
+    
         # Agregar un observador al estado del botón
         self.button_state = tk.StringVar()
         self.button_state.trace('w', self.on_button_state_change)
         self.button_state.set(self.button['state'])
+    
+        self.other_button = tk.Button(self.main_frame, text="Otro Botón",
+                                      command=lambda: self.mandar_correo())
+        self.other_button.place(relx=0.3, rely=0.9, anchor=tk.E)  # Ajusta 'relx' a 1.0 y 'anchor' a tk.E (este)
+        self.other_button.config(width=25, height=2, font=("Arial", 13))
+    
+
+    
+    def mandar_correo(self):
+    
+        try:
+            escenario_id = None
+            with open("escenario_ids.csv", "r", newline='') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if row: 
+                        escenario_id = row[0]  # Save the last escenario_id
+    
+            if escenario_id is not None:
+                full_path = os.path.join(self.path, escenario_id, 'timbrado')
+                #print(full_path)
+    
+                # # Print the contents of the directory
+                # print("Contents of the directory:")
+                # for filename in os.listdir(full_path):
+                #     print(filename)
+    
+                # Copy procesados.txt to procesados2.txt
+                shutil.copy(os.path.join(full_path, 'procesados.txt'), os.path.join(full_path, 'procesados2.txt'))
+                correo = EnviarCorreo()
+                correo.otro(escenario_id)
+    
+                # # Read and print the contents of procesados2.txt
+                # with open(os.path.join(full_path, 'procesados2.txt'), 'r') as file:
+                #     print(file.read())
+            else:
+                print("No escenario_id found.")
+        except FileNotFoundError:
+            print("El archivo no existe.")
+        
+        
 
     def iniciar_proceso_de_timbrado(self):
         data_sender = DataSender()
